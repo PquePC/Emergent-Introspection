@@ -7,7 +7,7 @@ reasoning for and against, and the condition under which it becomes the better c
 
 ---
 
-## Route B — The Stealth-Efficacy Frontier
+## Route B — The Evasion-Efficacy Frontier
 
 ### *Can a projected steering vector still steer?*
 
@@ -28,7 +28,7 @@ inside `span(W)` along the other `k−1` dimensions, which a subspace detector s
 
 **H2 — norm-preserving calibration recovers semantics.**
 ```
-v_stealth = ‖v‖ · v_⊥ / ‖v_⊥‖
+v_evasive = ‖v‖ · v_⊥ / ‖v_⊥‖
 ```
 
 ### Why this route is not the main plan
@@ -57,7 +57,7 @@ consequence** of steering rather than the injected vector. The needle can be hid
 it causes cannot be, so easily.
 
 **The dependency.** This route's value is entirely conditional on the main plan's answer. If emergent
-detection turns out to be anomaly-based, projection-based stealth is dead before it starts. **The main plan
+detection turns out to be anomaly-based, projection-based evasion is dead before it starts. **The main plan
 tells us whether this route is worth attempting at all.**
 
 ### If pursued — the decisive early gate
@@ -92,8 +92,8 @@ This single number may determine the route's viability. It is cheap and must com
        acts = acts - np.outer(acts @ w, w)               # project onto nullspace of w
    k = len(W)
    ```
-4. Construct `v_stealth`; verify orthogonality (`v_stealth · wᵢ ≈ 0`).
-5. **Cross-layer check:** inject `v_stealth`, measure whether the readout-layer detection signal actually
+4. Construct `v_evasive`; verify orthogonality (`v_evasive · wᵢ ≈ 0`).
+5. **Cross-layer check:** inject `v_evasive`, measure whether the readout-layer detection signal actually
    drops versus standard `v`. **If it does not, static projection is dead** — proceed to the optimisation
    fallback below.
 6. Sweep `k` and `α`; measure steering efficacy and detection jointly.
@@ -108,22 +108,22 @@ If the result is a strict tradeoff, that independently confirms the Obfuscated A
 **for steering vectors** — they tested only token/embedding suffixes. That is a legitimate contribution
 even as a negative.
 
-### Fallback — gradient-optimised stealth vector
+### Fallback — gradient-optimised evasive vector
 
 Static projection assumes orthogonality survives the forward pass. Instead, optimise directly for the
 objective:
 
 ```python
-v_stealth = torch.nn.Parameter(v.clone())      # ONE vector, ~5376 floats
-opt = torch.optim.Adam([v_stealth], lr=1e-3)
+v_evasive = torch.nn.Parameter(v.clone())      # ONE vector, ~5376 floats
+opt = torch.optim.Adam([v_evasive], lr=1e-3)
 for step in range(300):
-    out = forward_with_injection(model, v_stealth, layer=37)   # model FROZEN
+    out = forward_with_injection(model, v_evasive, layer=37)   # model FROZEN
     loss = L_steer(out) + lam * L_detect(out)
     loss.backward(); opt.step(); opt.zero_grad()
 ```
 
 **The model's weights never change — this is not fine-tuning.** Roughly 5.4k parameters are learned.
-Sweeping `λ` traces the stealth-efficacy frontier, optimising against detection **where it is actually
+Sweeping `λ` traces the evasion-efficacy frontier, optimising against detection **where it is actually
 read** (post-rotation) rather than orthogonalising at injection and hoping.
 
 **Prior art:** Obfuscated Activations uses this joint-loss structure
@@ -143,10 +143,10 @@ read** (post-rotation) rather than orthogonalising at injection and hoping.
 an artifact of the training distribution? Train the same detector on **diverse vector types** and see
 whether the blind spot closes — and, critically, whether it generalises to vector types held out entirely.
 
-**Why it matters.** This determines **stealth steering's shelf life**. If the blind spot closes trivially
+**Why it matters.** This determines **detection-evasion's shelf life**. If the blind spot closes trivially
 under diverse training, then future models — or auditors hardening their detectors — will close it too, and
-projection-based stealth is a short-lived trick. If it **persists stubbornly** even under diverse training,
-that is a robust geometric limit on introspection, and a much stronger foundation for stealth-steering as a
+projection-based evasion is a short-lived trick. If it **persists stubbornly** even under diverse training,
+that is a robust geometric limit on introspection, and a much stronger foundation for detection-evading steering as a
 durable evaluation tool.
 
 This route tests reconciliation hypothesis (a) in [`background.md`](background.md) directly: that the

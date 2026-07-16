@@ -37,7 +37,7 @@ evaluation would then systematically *under*-estimate the risk it exists to meas
 steering does *not* presently alter model behaviour — indeed, Fonseca Rivera & Africa find that
 detection-trained models become *more* steerable, not less. **We are not claiming models sandbag today.**
 The point is that the countermeasure must exist *before* the capability does. If steering-based evals are
-to remain trustworthy as models grow more introspective, the field needs to know **now** whether stealth
+to remain trustworthy as models grow more introspective, the field needs to know **now** whether detection-evading
 steering is achievable in principle — and that hinges entirely on the directional-vs-anomalous question.
 
 **Why the answer is load-bearing:**
@@ -45,7 +45,7 @@ steering is achievable in principle — and that hinges entirely on the directio
 | If steering-awareness is… | Then… |
 |---|---|
 | **Directional** — keyed to specific directions in activation space | Steering vectors can be constructed to avoid the detection subspace. **Steering-based evals can be hardened** against future sandbagging, and this project shows how. |
-| **Anomaly-based** — firing on any off-distribution perturbation | Direction-projection stealth is a **dead end for exactly the models the risk targets.** The field should stop investing in it and pursue other routes to robust evaluation. |
+| **Anomaly-based** — firing on any off-distribution perturbation | Direction-projection evasion is a **dead end for exactly the models the risk targets.** The field should stop investing in it and pursue other routes to robust evaluation. |
 
 The second outcome is arguably the more valuable contribution: it prevents the field from building on
 sand.
@@ -146,8 +146,3 @@ elided.
 is not that finding. It is the untested question of whether the same holds for **emergent** introspection —
 where the leading mechanistic account (Macar et al.) predicts it will **not**.
 
----
-
-## Status
-
-Planning complete; awaiting funding decision. Implementation not yet begun.

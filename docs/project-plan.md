@@ -29,8 +29,8 @@ detect Gaussian noise *"often with perfect accuracy."*
 
 | Outcome | Interpretation | Consequence |
 |---|---|---|
-| **Blind spot replicates** — PCA/random ≈ 0% on emergent detection | Detection is directional even without detection training | **Stealth steering is viable.** Steering-based evaluations can be hardened against future sandbagging. Fonseca Rivera's finding generalises beyond trained detectors. |
-| **Blind spot absent** — random/noise detected | Detection is anomaly-based; the published directionality was a training artifact | **Direction-projection stealth is a dead end** for the models the risk targets. Resolves the contradiction in favour of Macar/Fornasiere. Redirects the field. |
+| **Blind spot replicates** — PCA/random ≈ 0% on emergent detection | Detection is directional even without detection training | **Detection-evading steering is viable.** Steering-based evaluations can be hardened against future sandbagging. Fonseca Rivera's finding generalises beyond trained detectors. |
+| **Blind spot absent** — random/noise detected | Detection is anomaly-based; the published directionality was a training artifact | **Direction-projection evasion is a dead end** for the models the risk targets. Resolves the contradiction in favour of Macar/Fornasiere. Redirects the field. |
 | **Format-dependent** — binary blind, forced-choice sighted | The literature's contradiction is a task-format artifact | Methodologically the most valuable outcome: a correction the whole subfield needs. |
 
 There is no outcome in which this experiment produces nothing.
@@ -212,5 +212,5 @@ Non-negotiable, and directly responsive to published critiques of this literatur
    directional or anomalous?
 3. **A format-effect analysis** — does binary vs forced-choice explain the noise-detection contradiction?
 4. **A reusable harness** for evaluating detection across steering-vector construction methods.
-5. **A clear statement of consequence for steering-based evaluation:** whether stealth steering is a
+5. **A clear statement of consequence for steering-based evaluation:** whether detection-evading steering is a
    viable route to sandbagging-robust audits, or a dead end.

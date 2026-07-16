@@ -2,17 +2,15 @@
 
 References for the Emergent Introspection project.
 
-**Verification note.** Entries marked ⚠️ were compiled from abstracts, landing pages, or search results
-rather than full-text reads, and several carry recent arXiv identifiers. Verify identifiers, author lists,
-and venue details before external citation. Items marked **[CORE]** are load-bearing for the main plan and
-should be read in full before implementation begins.
+Items marked **[CORE]** are load-bearing for the main plan and should be read in full before
+implementation begins.
 
 ---
 
 ## Primary — steering awareness and introspection
 
 **[CORE]** Lindsey, J. (2025). *Emergent Introspective Awareness in Large Language Models.* Anthropic.
-Transformer Circuits. https://transformer-circuits.pub/2025/introspection/index.html · arXiv:2601.01828 ⚠️
+Transformer Circuits. https://transformer-circuits.pub/2025/introspection/index.html · arXiv:2601.01828
 > The anchor paper. Establishes concept injection as the paradigm for separating genuine introspection from
 > confabulation. Injects at ~2/3 depth; strengths 2 and 4; ~20% success on Opus 4/4.1. Measures verbal
 > self-report. Reports content-specificity and a strength sweet spot. Warns of the dual-use risk that
@@ -27,7 +25,7 @@ from Within.* arXiv:2511.21399. https://arxiv.org/abs/2511.21399
 > **detection does not confer resistance.**
 
 **[CORE]** Macar, U., Yang, L., Wang, A., Wallich, P., Ameisen, E. & Lindsey, J. (2026). *Mechanisms of
-Introspective Awareness.* arXiv:2603.21396 ⚠️ · Code: https://github.com/safety-research/introspection-mechanisms
+Introspective Awareness.* arXiv:2603.21396 · Code: https://github.com/safety-research/introspection-mechanisms
 > The mechanistic account of **emergent** introspection, and the source of the main plan's model
 > (Gemma3-27B), injection layer (L37/62), and baseline (38.2% TPR @ 0% FPR). Reports the evidence-carrier →
 > gate-suppression circuit, refusal-driven under-elicitation (10.8% → 63.8%), DPO-not-SFT origin, and
@@ -35,17 +33,17 @@ Introspective Awareness.* arXiv:2603.21396 ⚠️ · Code: https://github.com/sa
 > test random or noise vectors.**
 
 **[CORE]** Fornasiere, M., et al. (2026). *Language Models Recognize Dropout and Gaussian Noise Applied to
-Their Activations.* arXiv:2604.17465 ⚠️
+Their Activations.* arXiv:2604.17465
 > Llama/Olmo/Qwen, 8B–32B, detect and localise dropout and Gaussian noise "often with perfect accuracy" via
 > forced-choice tasks. Directly contradicts Fonseca Rivera's 94% Gaussian-noise rejection. Raises the
 > "data-agnostic training awareness" hypothesis.
 
-Lederman, H. & Mahowald, K. (2026). *Emergent Introspection in AI is Content-Agnostic.* arXiv:2603.05414 ⚠️
+Lederman, H. & Mahowald, K. (2026). *Emergent Introspection in AI is Content-Agnostic.* arXiv:2603.05414
 > "Introspection in these models is content-agnostic: models can detect that an anomaly occurred even when
 > they cannot reliably identify its content." Replicates Lindsey's paradigm on open models.
 
 **[CORE]** *Detecting the Disturbance: A Nuanced View of Introspective Abilities in LLMs.* (2026).
-arXiv:2512.12411 ⚠️
+arXiv:2512.12411
 > The methodological critique that shapes the main plan's measurement discipline. Argues apparent binary
 > detection is "entirely explained by global logit shifts." Positive findings on Llama-3.1-8B: localisation
 > 88% (vs 10% chance), strength discrimination 83% (vs 50%) — but "confined to early-layer injections."
@@ -87,19 +85,19 @@ LLMs.* AlignmentForum. https://www.alignmentforum.org/posts/QQP4nq7TXg89CJGBh/a-
 > inputs, capability degradation, inflated MCQ benchmarks.
 
 Aparin, G. & Gaintseva, T. (2026). *A Geometric Account of Activation Steering through Angle-Norm
-Decomposition.* arXiv:2606.06735 ⚠️
+Decomposition.* arXiv:2606.06735
 > "Concepts are represented primarily in angular structure... norm remains important for the stability and
 > downstream effects of steering." **The source of the theoretical objection to norm-preserving
 > calibration** (see [`docs/alternative-routes.md`](docs/alternative-routes.md), Route B).
 
 *Endogenous Resistance to Activation Steering in Language Models.* (2026). Agency Enterprise.
-arXiv:2602.06941 ⚠️
+arXiv:2602.06941
 > Models exhibit built-in compensatory resistance to injected steering — in tension with the
 > detection-≠-resistance finding.
 
 ---
 
-## Adversarial robustness and stealth
+## Adversarial robustness and detection evasion
 
 **[CORE]** *Obfuscated Activations Bypass LLM Latent-Space Defenses.* (2024/25). arXiv:2412.09565.
 https://arxiv.org/abs/2412.09565
@@ -109,12 +107,12 @@ https://arxiv.org/abs/2412.09565
 > preserving behavior."** Documents the obfuscation-performance tradeoff.
 
 *Steering in the Shadows: Causal Amplification for Activation Space Attacks in Large Language Models.*
-(2025). arXiv:2511.17194 ⚠️
+(2025). arXiv:2511.17194
 > Sensitivity-Scaled Steering: BOS anchoring plus sensitivity-based reinforcement, exploiting a "high-gain
 > region in the residual stream." Note: "stealth" here means preserved coherence, **not** evading model
 > introspection — a different sense of the word.
 
-*Trojan Activation Attack: Red-Teaming Large Language Models using Steering Vectors for Safety-Alignment.* ⚠️
+*Trojan Activation Attack: Red-Teaming Large Language Models using Steering Vectors for Safety-Alignment.*
 > Steering vectors as an attack surface for red-teaming.
 
 ---
@@ -148,7 +146,7 @@ https://arxiv.org/abs/2505.23836
 > evaluation-awareness strand of the risk pathway motivating this project.
 
 Nguyen, J., Hoang, K., Attubato, C. L. & Hofstätter, F. (2025). *Probing and Steering Evaluation Awareness
-of Language Models.* arXiv:2507.01786 ⚠️
+of Language Models.* arXiv:2507.01786
 > Linear probes for latent evaluation-awareness, plus steering to manipulate it.
 
 Hua, T., Marks, S., Nanda, N., et al. *Steering Evaluation-Aware Language Models to Act Like They Are

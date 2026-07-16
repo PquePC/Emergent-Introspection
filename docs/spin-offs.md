@@ -22,7 +22,7 @@ conclude *"models possess greater introspective capability than is elicited by d
 model suddenly detect random, PCA, and noise vectors that it otherwise ignores?
 
 **Why this is the highest-value extension.** It can **flip the main plan's headline.** If the blind spot
-exists only because introspection is suppressed by refusal circuitry, then "stealth steering works" is an
+exists only because introspection is suppressed by refusal circuitry, then "detection-evading steering works" is an
 artifact of under-elicitation — and a future model with better-elicited introspection closes the blind spot
 for free, with no adversarial effort at all. That is a direct hit on the project's theory of impact, and it
 is far better to discover it here than to have a reviewer point it out.
@@ -66,7 +66,7 @@ angular structure, [but] norm remains important for the stability and downstream
 answer determines whether direction-projection is even the right lever:
 - If detection is **angle-driven**, projection is the correct approach, and Route B's H2 problem (that
   renormalisation cannot restore projected-away angular content) is real and unavoidable.
-- If detection is **norm-driven**, the entire stealth-steering framework needs rethinking — you would evade
+- If detection is **norm-driven**, the entire detection-evasion framework needs rethinking — you would evade
   detection by shrinking the vector, not by rotating it.
 
 **Method.** Two orthogonal sweeps: vary `‖v‖` at fixed direction; vary direction at fixed `‖v‖`. Measure

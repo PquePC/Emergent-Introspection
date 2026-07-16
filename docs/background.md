@@ -275,12 +275,12 @@ time; Fornasiere's models detect Gaussian noise *near-perfectly*. Same stimulus,
 ## 5. Open questions, ranked
 
 1. **Is emergent steering-awareness directional (evadable) or anomaly-based (not)?** Resolves C1;
-   determines whether stealth steering is possible at all for future models. **← the main plan.**
+   determines whether detection-evading steering is possible at all for future models. **← the main plan.**
 2. **Do random / Gaussian / dropout perturbations trigger *emergent* detection?** Macar explicitly did not
    test this; Fonseca Rivera says no (trained); Fornasiere says yes (emergent).
 3. **Does task format explain the noise contradiction?** Methodological, and would clean up the literature.
-4. **Can a detector trained on diverse vector types close the CAA blind spot?** Determines stealth
-   steering's shelf life. → [`alternative-routes.md`](alternative-routes.md), Route C.
+4. **Can a detector trained on diverse vector types close the CAA blind spot?** Determines
+   detection-evasion's shelf life. → [`alternative-routes.md`](alternative-routes.md), Route C.
 5. **Does the blind spot survive refusal ablation, or is it an under-elicitation artifact?**
    → [`spin-offs.md`](spin-offs.md), S1.
 6. **Does norm-restoration recover post-projection semantics?** Theory (Aparin & Gaintseva) says no.
@@ -297,7 +297,7 @@ time; Fornasiere's models detect Gaussian noise *near-perfectly*. Same stimulus,
 | Orthogonal/PCA/random vectors evade a **CAA-trained** detector | **Established** — Fonseca Rivera, Table 5 |
 | Projecting onto the orthogonal complement to defeat a linear probe | **Established** — LEACE / INLP / concept erasure |
 | Optimising an input to fool latent-space monitors while preserving behaviour | **Established** — Obfuscated Activations (suffix-based) |
-| Stealthy activation attacks preserving coherence | **Established** — *Steering in the Shadows* |
+| Coherence-preserving activation attacks | **Established** — *Steering in the Shadows* |
 | Steering vectors as a red-teaming attack | **Established** — *Trojan Activation Attack* |
 | **Does orthogonal projection evade *emergent* introspection?** | **OPEN ← the main plan** |
 | **Are random/noise vectors detected by *emergent* introspection?** | **OPEN** — Macar explicitly did not test |
