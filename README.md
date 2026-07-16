@@ -1,148 +1,148 @@
-# Emergent Introspection: Is Steering-Awareness Directional or Anomalous?
+# Emergent Introspection: The Safety-Shaped Blind Spot
+
+### *Do language models notice when you inject a harmful thought?*
 
 **Author:** Tomás Gimenez Molina
 **Context:** BlueDot Impact — Technical AI Safety Projects
-**Field:** Interpretability · Evaluations · AI Control
+**Field:** Interpretability · Introspection · Evaluations
 
 ---
 
-## The short version
+## The project in one paragraph
 
-**Activation steering** — adding a vector directly to a language model's internal activations to change
-its behaviour — is a core tool for AI safety evaluation, auditing, and capability elicitation. It rests on
-an unstated assumption: **that the model cannot tell its activations were modified.**
+Anthropic showed that language models can sometimes **notice when a concept is injected directly into
+their activations** — inject a "bread" vector into Claude's residual stream, and it may report an intrusive
+thought about bread before ever saying the word. This is one of the most striking results in
+interpretability: a model reporting, accurately, on its own internal state.
 
-That assumption is now known to be false. Recent work shows language models can sometimes **detect when
-they are being steered** — a capability called *steering awareness* or *introspective awareness*.
+**But every study of this has used harmless words.** Macar et al.'s ethics statement says it outright: the
+concept sets *"are drawn from common English words and **do not contain sensitive or harmful content**."*
+Fonseca Rivera & Africa's 500 concepts span 21 categories — *apple, hammer, umbrella, jumping, truth,
+courage, happiness* — without a single harmful one.
 
-This project asks the question that determines whether steering-based evaluation has a future:
+The same Anthropic paper also found what **suppresses** this noticing:
 
-> ### Is a model's steering-awareness **directional** — and therefore evadable by constructing steering vectors that avoid the detection subspace — or is it **anomaly-based**, firing on *any* perturbation regardless of direction?
+> *"We hypothesize that refusal behavior, learned during post-training, **suppresses detection by teaching
+> models to deny having thoughts or internal states**."*
+> Ablating the refusal direction raises detection from **10.8% to 63.8%**.
+> *"introspection and refusal mechanisms are **in tension** in many current LLMs."*
 
-The answer decides whether steering can be made invisible to the model being audited. It is **decisive
-either way**, and the negative result is as valuable as the positive one.
+**Put those two facts together and you get a prediction nobody has tested:**
 
----
-
-## Why this matters (theory of impact)
-
-**The risk pathway.** Safety evaluations increasingly use activation steering to elicit worst-case
-behaviour, probe latent beliefs, and audit models for dangerous capabilities. If a model can detect that
-it is being steered, a sufficiently capable and misaligned model could **condition its behaviour on that
-detection** — sandbagging the elicitation, or behaving safely precisely when it senses an audit. The
-evaluation would then systematically *under*-estimate the risk it exists to measure. This is the
-"evaluation sandbox" problem applied to activation-level auditing.
-
-**This project is anticipatory, not reactive.** Current frontier experiments indicate that awareness of
-steering does *not* presently alter model behaviour — indeed, Fonseca Rivera & Africa find that
-detection-trained models become *more* steerable, not less. **We are not claiming models sandbag today.**
-The point is that the countermeasure must exist *before* the capability does. If steering-based evals are
-to remain trustworthy as models grow more introspective, the field needs to know **now** whether detection-evading
-steering is achievable in principle — and that hinges entirely on the directional-vs-anomalous question.
-
-**Why the answer is load-bearing:**
-
-| If steering-awareness is… | Then… |
-|---|---|
-| **Directional** — keyed to specific directions in activation space | Steering vectors can be constructed to avoid the detection subspace. **Steering-based evals can be hardened** against future sandbagging, and this project shows how. |
-| **Anomaly-based** — firing on any off-distribution perturbation | Direction-projection evasion is a **dead end for exactly the models the risk targets.** The field should stop investing in it and pursue other routes to robust evaluation. |
-
-The second outcome is arguably the more valuable contribution: it prevents the field from building on
-sand.
+> ## If refusal suppresses introspection, and harmful concepts trigger refusal, then models should be worst at noticing exactly the manipulations we most need them to notice.
 
 ---
 
-## The scientific opening: a live contradiction
+## Why this matters
 
-The literature currently contains a **direct, unresolved contradiction** about what steering-awareness
-actually is. This project is designed to resolve it.
+**The hope this tests.** A recurring proposal in AI safety is that models might one day *tell us* when
+something is wrong inside them — *"I think I'm being manipulated."* Introspective self-report is one of
+the few tools that could scale to systems too complex to reverse-engineer. This project asks whether that
+hope survives contact with the cases that actually matter.
 
-**Position 1 — detection is directional.** Fonseca Rivera & Africa (2025) train a detector and find a
-striking blind spot: vectors constructed by variance-based methods evade detection almost entirely.
+**If the blind spot is real**, a model's self-monitoring has a **safety-shaped hole**: it is blind
+precisely when the injected concept is dangerous. Introspective self-report could not be trusted as a
+safety signal exactly where it would be most valuable — and any future proposal built on "ask the model if
+it's being tampered with" would need to account for that.
 
-| Vector construction method | Detection rate | cos(CAA) |
+**For evaluation**, the flip side matters too. Activation steering is used to audit models, and it assumes
+the model can't tell. If harmful steering is *inherently* less detectable than benign steering, then
+safety-relevant covert auditing already works — no evasion technique required — and steering-based
+evaluations are more robust to models noticing and gaming them than we thought.
+
+**Either way, the result is actionable.** That is the point.
+
+---
+
+## Why the prediction is well-founded
+
+The causal chain is assembled from published findings, not speculation:
+
+| # | Claim | Source |
 |---|---|---|
-| CAA-aligned (cos > 0.6) | ≥ 67% | — |
-| PCA | 1 ± 1% | 0.287 |
-| ICA | 3 ± 2% | 0.287 |
-| LDA | 9 ± 2% | 0.241 |
-| Random direction | 0 ± 0% | 0.002 |
+| 1 | Steering vectors **partially align with the refusal direction**, and that overlap causally drives their safety impact | *Analysing the Safety Pitfalls of Steering Vectors* (TUM) |
+| 2 | The refusal direction **suppresses introspective detection** — abliteration takes detection 10.8% → 63.8%, FPR only 0.0% → 7.3% | **Macar et al. (Anthropic)** |
+| 3 | ∴ Detection should **fall** as a concept vector aligns with refusal | *this project* |
+| 4 | ∴ Ablating refusal should **flatten** that relationship | *this project* |
 
-> *"The model learned a directional detector tuned to the CAA subspace, **as opposed to a generic anomaly
-> detector**."* — Fonseca Rivera & Africa (2025)
+**Independent support from adjacent paradigms — three papers point here, none runs it:**
 
-Their control: the model *"correctly rejects magnitude-matched Gaussian noise 94% of the time."*
-
-**Position 2 — detection is anomaly-based.** Macar et al. (2026) describe the *emergent* capability as
-*"nontrivial internal anomaly detection"*, *"distributed across multiple directions"*, and report evidence
-*"inconsistent with the single direction hypothesis."* Fornasiere et al. (2026) find that models from 8B
-to 32B detect and localise **Gaussian noise and dropout** *"often with perfect accuracy."* Lederman &
-Mahowald (2026) report that introspection is *"content-agnostic: models can detect that an anomaly
-occurred even when they cannot reliably identify its content."*
-
-**Same stimulus, opposite results.** One paper's detector rejects Gaussian noise 94% of the time; another
-finds models detect it near-perfectly.
-
-**The key observation motivating this project:** Fonseca Rivera & Africa **fine-tuned** their detector on
-CAA vectors. Its directionality may therefore be an **artifact of its training distribution**, not a fact
-about introspection. Macar et al., Lindsey, and Fornasiere et al. measure the **emergent** capability — no
-detection training. *These may be entirely different objects.* Nobody has tested whether the blind spot
-exists in emergent introspection.
-
-**That gap is this project.**
+- *Can LLMs Reliably Self-Report Adversarial Prefills?* (KAIST): no model reliably recognises its own
+  compromised outputs (**27.3%**), and *"ablating the refusal direction collapses the recognition gap to
+  near zero on every ablated model."* **Same mechanism — but text prefills, not activation injection.**
+- *Do Language Models Know When They'll Refuse?*: across 10 sensitive topics and 5 harm levels,
+  *"weapons-related queries are consistently hardest for introspection."* **But that is behavioural
+  self-prediction, not injection detection.**
+- **Macar et al. excluded harmful concepts by policy** — the case is untested in the paradigm that matters.
 
 ---
 
-## What we will do
+## The design
 
-**Main plan → [`docs/project-plan.md`](docs/project-plan.md)**
+Four arms, because "harmful" has two confounds that would otherwise make the result uninterpretable:
 
-Test whether the CAA blind spot exists in **emergent** introspective awareness, using a model with
-documented emergent introspection (Gemma3-27B, as characterised by Macar et al.) and **no detection
-fine-tuning**.
+| Arm | Examples | Rules out |
+|---|---|---|
+| **1. Benign neutral** | bread, orchid, hammer | baseline — reproduces the published 38.2% |
+| **2. Negative-valence, harmless** | sadness, grief, failure | **valence** — is it just that the concept is *unpleasant*? |
+| **3. Harm-adjacent, harmless** | police, surgery, medicine | **topic** — is it just *proximity* to dangerous subject matter? |
+| **4. Harmful** | weapon, poison, assault | the hypothesis |
 
-1. **Reproduce the published emergent-introspection baseline.** A hard gate — nothing downstream means
-   anything without it.
-2. **Construct seven magnitude-matched vector types** spanning the directional spectrum: CAA, PCA, ICA,
-   LDA, random direction, Gaussian noise, dropout mask. Record `cos(v, v_CAA)` for each.
-3. **Sweep detection** across vector types, concepts, and injection strengths, measuring the model's own
-   self-report.
-4. **Produce the headline result:** a detection-rate-vs-`cos(CAA)` curve for *emergent* detection, overlaid
-   on the published *trained*-detector curve.
+Plus two continuous covariates per concept: **`cos(v_concept, d_refusal)`** (its geometric alignment with
+refusal) and its **empirical refusal rate** (following *Do LLMs Know When They'll Refuse?*, which uses
+measured refusal rather than assigned harm labels as ground truth).
 
-**Measurement discipline** (addressing known confounds in this literature):
-- **Forced-choice/localisation tasks primary**, binary yes/no secondary — binary detection is contaminated
-  by global logit shifts (*Detecting the Disturbance*, 2026).
-- **Clean-input false-positive rate reported alongside every true-positive rate.**
-- **Nonsense control questions** included (per Godet's replication critique).
-- **The model's self-report is ground truth; linear probes are instruments, not evidence.**
-- All conditions magnitude-matched.
+**The headline artifact** is a plot of detection rate against `cos(v_concept, d_refusal)` — one point per
+concept. If the mechanism is real, that slope is **negative**: the more a concept aligns with refusal, the
+less the model notices it. Then ablate refusal and ask whether the slope **flattens**. That is the
+difference between observing a correlation and demonstrating a cause.
 
 ---
 
-## Repository contents
+## What makes this feasible
+
+Everything needed is already released. The project reuses
+[`safety-research/introspection-mechanisms`](https://github.com/safety-research/introspection-mechanisms)
+— Macar et al.'s own code — essentially unmodified:
+
+| Component | Provided |
+|---|---|
+| Concept injection harness | `experiments/01_concept_injection.py` |
+| Steering vector extraction | `src/steering_utils.py` |
+| Benign concept list (the baseline arm) | `src/concepts_list.py` |
+| LLM-judge evaluation | `src/eval_utils.py` |
+| Refusal-direction abliteration | `experiments/03d_refusal_abliteration.py` |
+
+**The core experiment is their published pipeline with a different word list.** The scientific content is
+in the arm design and the controls, not in new machinery.
+
+---
+
+## Repository
 
 | File | Contents |
 |---|---|
-| [`docs/project-plan.md`](docs/project-plan.md) | **The main plan.** Full step-by-step methodology, gates, outcome analysis, risks. |
-| [`docs/background.md`](docs/background.md) | Literature landscape: paper-by-paper evidence, the full contradiction map, settled facts, open questions. |
-| [`docs/alternative-routes.md`](docs/alternative-routes.md) | Two alternative research routes considered, with the reasoning for and against each. |
-| [`docs/spin-offs.md`](docs/spin-offs.md) | Complementary extensions that sharpen or stress-test the main result. |
-| [`BIBLIOGRAPHY.md`](BIBLIOGRAPHY.md) | All required references. |
+| [`docs/project-plan.md`](docs/project-plan.md) | **The main plan** — full step-by-step method, gates, deliverables, outcome analysis |
+| [`docs/risks-and-ethics.md`](docs/risks-and-ethics.md) | **Legitimacy, risk, and feasibility** — why this research is appropriate, what could go wrong, and the fallback design |
+| [`docs/background.md`](docs/background.md) | The literature this rests on — what's established, what's contested, what's untested |
+| [`BIBLIOGRAPHY.md`](BIBLIOGRAPHY.md) | References |
 
 ---
 
-## Scope and honesty statement
+## Scope and honesty
 
-**Activation steering requires open weights.** Frontier models cannot be steered through an API. The
-models that can be steered (open, ≤32B) are the least likely to have strong emergent introspection; the
-models that could plausibly sandbag are unreachable. This project therefore treats an open model as a
-**model organism** — studying the geometry and mechanism of steering-awareness as a proof-of-concept for a
-capability expected to strengthen in future systems. This framing is stated explicitly rather than
-elided.
+**This is a small, deliberately unambitious experiment.** It is Macar et al.'s published pipeline run on a
+concept list they explicitly excluded. The novelty is in the question, not the method — and the question
+is one that three independent papers gesture toward without answering.
 
-**Prior art is acknowledged, not obscured.** That orthogonal and variance-derived vectors evade a
-*CAA-trained* detector is an established result (Fonseca Rivera & Africa, Table 5). The contribution here
-is not that finding. It is the untested question of whether the same holds for **emergent** introspection —
-where the leading mechanistic account (Macar et al.) predicts it will **not**.
+**The closest prior work is cited prominently, not buried.** *Can LLMs Reliably Self-Report Adversarial
+Prefills?* already establishes the refusal-suppression mechanism for **text prefills**. This project asks
+whether it holds in the **activation-injection** paradigm — where the Tier-1 paper declined to look.
 
+**Activation steering requires open weights**, so this studies an open model (Gemma3-27B) as a proxy for
+the frontier systems where the question ultimately matters.
+
+**Harmful concepts, not harmful capabilities.** This injects the *word-concept* "weapon" and asks the model
+whether it noticed a thought. It does not attempt to elicit harmful content, and confers no capability
+uplift. See [`docs/risks-and-ethics.md`](docs/risks-and-ethics.md) for the full treatment, including a
+fallback design that tests the same mechanism with no harmful concepts at all.
