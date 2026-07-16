@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Experiment artifacts
+results/
+outputs/
+checkpoints/
+cache/
+*.pt
+*.safetensors
+*.npy
+*.npz
+activations/
+vectors/
+
+# Logs
+*.log
+wandb/
+
+# Secrets
+.env
+*.key
+
+# OS
+.DS_Store
+Thumbs.db
