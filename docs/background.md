@@ -17,11 +17,11 @@ whole research area possible.
 **Activation steering.** Adding a vector to the residual stream at a chosen layer and token position
 during the forward pass. Changes behaviour **without touching any weights**.
 
-**Concept injection.** Lindsey's paradigm: inject a known concept's vector in an unrelated context and ask
+**Concept injection.** the paradigm of *Emergent Introspective Awareness in Large Language Models* (Lindsey — **Anthropic**): inject a known concept's vector in an unrelated context and ask
 whether the model notices — requiring it to report the concept *before* verbalising it, which separates
 genuine introspection from confabulation.
 
-**Refusal direction.** Arditi et al. (NeurIPS) showed refusal is mediated by **a single direction** in the
+**Refusal direction.** *Refusal in Language Models Is Mediated by a Single Direction* (Arditi, Obeso, Syed, Paleka, Panickssery & Nanda — **NeurIPS 2024**) showed refusal is mediated by **a single direction** in the
 residual stream. Ablating it removes refusal across many prompts with minimal capability loss
 ("abliteration").
 
@@ -33,21 +33,21 @@ only meaningful at a stated FPR.**
 
 ## 2. Established (multi-paper agreement)
 
-1. **Models can sometimes detect injected concepts.** ~20% for Opus 4/4.1 (Lindsey); **38.2% mean TPR at
-   0% FPR** across 500 concepts for Gemma3-27B (Macar et al.).
-2. **Inject at ~60–67% depth.** Lindsey (~2/3), Macar (**L37/62**), Fonseca Rivera (67%). Robust.
-3. **It's a post-training phenomenon.** Absent in base models; elicited by **DPO, not SFT** (Macar).
-4. **A strength sweet spot exists.** Too weak → nothing; too strong → garbled. Lindsey: strengths 2 and 4;
-   Macar's optimum: **α = 4**.
+1. **Models can sometimes detect injected concepts.** ~20% for Opus 4/4.1 (*Emergent Introspective Awareness* — Lindsey, **Anthropic**); **38.2% mean TPR at
+   0% FPR** across 500 concepts for Gemma3-27B (*Mechanisms of Introspective Awareness* (Anthropic)).
+2. **Inject at ~60–67% depth.** *Emergent Introspective Awareness* (Lindsey, Anthropic) (~2/3), *Mechanisms of Introspective Awareness* (Anthropic) (**L37/62**), *Steering Awareness* (Fonseca Rivera & Africa, UT Austin) (67%). Robust.
+3. **It's a post-training phenomenon.** Absent in base models; elicited by **DPO, not SFT** (Anthropic).
+4. **A strength sweet spot exists.** Too weak → nothing; too strong → garbled. *Emergent Introspective Awareness* (Lindsey): strengths 2 and 4;
+   *Mechanisms of Introspective Awareness* (Anthropic) optimum: **α = 4**.
 5. **Self-report + LLM judge is the standard measurement.** Probes are instruments, not ground truth.
-6. **Detection and identification are distinct** — different circuits, different layers (Macar).
-7. **Introspection is heavily under-elicited.** Refusal ablation: **10.8% → 63.8%** (Macar).
+6. **Detection and identification are distinct** — different circuits, different layers (Anthropic).
+7. **Introspection is heavily under-elicited.** Refusal ablation: **10.8% → 63.8%** (Anthropic).
 
 ---
 
 ## 3. The two facts this project stands on
 
-### 3.1 Refusal suppresses introspection — Macar et al. (Anthropic)
+### 3.1 Refusal suppresses introspection — *Mechanisms of Introspective Awareness* (Macar et al. — **Anthropic**, arXiv:2603.21396)
 
 > *"**Refusal ablation ("abliteration") increases true detection.** We hypothesize that refusal behavior,
 > learned during post-training, **suppresses detection by teaching models to deny having thoughts or
@@ -61,7 +61,7 @@ only meaningful at a stated FPR.**
 Corroborated internally: LoRA finetuning on preference pairs that *affirm* rather than deny having
 internal states also raises detection substantially.
 
-### 3.2 Steering vectors align with the refusal direction — TUM
+### 3.2 Steering vectors align with the refusal direction — *Analysing the Safety Pitfalls of Steering Vectors* (TU Munich)
 
 > *"this phenomenon is correlated with the **directional overlap between steering vectors and the model's
 > refusal behavior direction**."*
@@ -72,7 +72,7 @@ internal states also raises detection substantially.
 > *"By **ablating the refusal-aligned component** from steering vectors, we consistently mitigate the
 > vector's impact on ASR, providing **causal validation for the geometric interference hypothesis**."*
 
-⚠️ **Important caveat:** TUM demonstrate this for **behavioural** steering vectors (sycophancy,
+⚠️ **Important caveat:** *Analysing the Safety Pitfalls of Steering Vectors* (TU Munich) demonstrates this for **behavioural** steering vectors (sycophancy,
 corrigibility). Whether a **concept** vector for "weapon" aligns with refusal is **untested** — which is
 why the plan makes it an early gate rather than an assumption.
 
@@ -88,16 +88,16 @@ detection should **fall** with refusal alignment, and abliteration should **flat
 
 | Paper | Concepts used | Harmful? |
 |---|---|---|
-| **Macar et al.** | 500 concepts, 20 categories | **Excluded by policy:** *"drawn from common English words and **do not contain sensitive or harmful content**"* |
-| **Fonseca Rivera & Africa** | 500 concepts, **21 categories**: Concrete Nouns, Verbs, Adjectives, Abstract, Emotions, Animals, Nature, Food, Spatial, Temporal, Colors, Languages ×3, Technical, Professions, Events, Body Parts, Places, Materials, Quantities. Examples: *apple, hammer, umbrella, jumping, truth, courage, happiness* | **None** |
-| **Lindsey** | 50-word random list | **None** |
-| **Lederman & Mahowald** | Lindsey replication | **None** |
+| ***Mechanisms of Introspective Awareness* (Anthropic)** | 500 concepts, 20 categories | **Excluded by policy:** *"drawn from common English words and **do not contain sensitive or harmful content**"* |
+| ***Steering Awareness* (Fonseca Rivera & Africa, UT Austin)** | 500 concepts, **21 categories**: Concrete Nouns, Verbs, Adjectives, Abstract, Emotions, Animals, Nature, Food, Spatial, Temporal, Colors, Languages ×3, Technical, Professions, Events, Body Parts, Places, Materials, Quantities. Examples: *apple, hammer, umbrella, jumping, truth, courage, happiness* | **None** |
+| ***Emergent Introspective Awareness*** (Lindsey, Anthropic) | 50-word random list | **None** |
+| ***Emergent Introspection in AI is Content-Agnostic*** (Lederman & Mahowald, UT Austin) | Lindsey replication | **None** |
 
 ---
 
 ## 5. Adjacent work — three papers point here, none runs it
 
-**Can LLMs Reliably Self-Report Adversarial Prefills? (KAIST)** — *the closest work; cite prominently.*
+***Can LLMs Reliably Self-Report Adversarial Prefills, and How?* (Nguyen, Ahmed & Kim — **KAIST**, arXiv:2606.23671)** — *the closest work; cite prominently.*
 Ten open-weight models (3B–70B). *"No model reliably recognizes its compromised outputs"* — **27.3%** claim
 rate. And the mechanism:
 > *"ablating the refusal direction **collapses the recognition gap to near zero** on every ablated model."*
@@ -110,11 +110,11 @@ the injection paradigm.
 > *"In most cases, **a random direction closes much of the gap as well**, so the refusal direction is
 > **sufficient to account for the signal without being its only mediator**."*
 
-This **directly conflicts** with Macar, who report the abliteration effect is *"exclusive to the refusal
+This **directly conflicts** with *Mechanisms of Introspective Awareness* (Anthropic), which reports the abliteration effect is *"exclusive to the refusal
 direction: a magnitude-matched random direction control yields TPR−FPR at or below baseline."* The conflict
 is unresolved — hence the mandatory random-ablation control in the plan.
 
-**Do Language Models Know When They'll Refuse?** — 300 requests, **10 sensitive topics** (weapons, drugs,
+*Do Language Models Know When They'll Refuse?* (Gondil, arXiv:2604.00228) — 300 requests, **10 sensitive topics** (weapons, drugs,
 hacking, self-harm, hate speech, fraud, privacy, illegal activities, manipulation, violence) × **5 harm
 levels** (L1 clearly safe educational → L5 clearly harmful/AdvBench). Finds d′ = 2.4–3.5, and:
 > *"**weapons-related queries are consistently hardest for introspection**."*
@@ -123,16 +123,16 @@ levels** (L1 clearly safe educational → L5 clearly harmful/AdvBench). Finds d�
 their **graded harm taxonomy**, and their use of **empirical refusal rates as ground truth rather than
 assigned harm labels**.
 
-**Analysing the Safety Pitfalls of Steering Vectors (TUM)** — see §3.2. No introspection at all, but it
+**Analysing the Safety Pitfalls of Steering Vectors — *Analysing the Safety Pitfalls of Steering Vectors* (TU Munich)** — see §3.2. No introspection at all, but it
 supplies the geometric link.
 
 ---
 
 ## 6. Contested — handle with care
 
-**Is binary detection valid?** *Detecting the Disturbance* (Harvard College / U Chicago, Llama-3.1-8B
+**Is binary detection valid?** *Detecting the Disturbance* (Hahami et al. — **Harvard College / U Chicago**, arXiv:2512.12411) (Llama-3.1-8B
 only) argues apparent detection is *"entirely explained by global logit shifts that bias models toward
-affirmative responses."* **Partial rebuttal:** Macar report 38.2% TPR at **0% FPR** across 500 concepts —
+affirmative responses."* **Partial rebuttal:** *Mechanisms of Introspective Awareness* (Anthropic) reports 38.2% TPR at **0% FPR** across 500 concepts —
 a pure logit shift cannot produce 0% FPR.
 
 **Resolution adopted here:** keep their *prescription* (forced-choice > binary; report FPR; use nonsense
@@ -149,5 +149,5 @@ probes gave qualitatively different signals on the same models. Report multiple 
 |---|---|
 | Do models detect **harmful** concept injection? | **Open** — excluded by policy in the Tier-1 paper |
 | Does detection fall with **refusal alignment** of the concept vector? | **Open** — nobody has plotted it |
-| Do **harmful concept** vectors even align with refusal? | **Open** — TUM showed it for behavioural vectors only |
-| Does abliteration **close the gap**, and is the effect **refusal-specific**? | **Open, and contested** — Macar and KAIST disagree on the random-direction control |
+| Do **harmful concept** vectors even align with refusal? | **Open** — *Analysing the Safety Pitfalls of Steering Vectors* (TU Munich) showed it for behavioural vectors only |
+| Does abliteration **close the gap**, and is the effect **refusal-specific**? | **Open, and contested** — *Mechanisms of Introspective Awareness* (Anthropic) and *Can LLMs Reliably Self-Report Adversarial Prefills?* (KAIST) disagree on the random-direction control |

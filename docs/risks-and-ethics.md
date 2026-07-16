@@ -38,14 +38,14 @@ released code:
 
 | Precedent | What was published | Venue / lab |
 |---|---|---|
-| **Arditi et al., *Refusal in Language Models Is Mediated by a Single Direction*** | A method to **remove refusal from any open-weight model**, with code | **NeurIPS** |
+| ***Refusal in Language Models Is Mediated by a Single Direction* (Arditi et al. — **NeurIPS 2024**)** | A method to **remove refusal from any open-weight model**, with code | **NeurIPS** |
 | **Zou et al., *Representation Engineering*** | Harmful/power-seeking/deception directions; **AdvBench** | CAIS / CMU / Berkeley / Stanford |
-| **Macar et al. (Anthropic)** | Refusal abliteration on Gemma3-27B, with released code and configs | **Anthropic** |
-| **TUM, *Analysing the Safety Pitfalls of Steering Vectors*** | Steering that swings jailbreak success **+57% / −50%** | TUM / MCML |
-| **Fonseca Rivera & Africa** | Compliance vectors injected into **AdvBench harmful requests** | UT Austin |
-| **KAIST, *Can LLMs Reliably Self-Report Adversarial Prefills?*** | Adversarial prefill attacks + refusal orthogonalisation across 10 models | KAIST |
+| ***Mechanisms of Introspective Awareness* (Macar et al. — **Anthropic**, arXiv:2603.21396)** | Refusal abliteration on Gemma3-27B, with released code and configs | **Anthropic** |
+| ***Analysing the Safety Pitfalls of Steering Vectors* (Li et al. — **TU Munich / MCML**, arXiv:2603.24543)** | Steering that swings jailbreak success **+57% / −50%** | TUM / MCML |
+| ***Steering Awareness* (Fonseca Rivera & Africa, UT Austin)** | Compliance vectors injected into **AdvBench harmful requests** | UT Austin |
+| ***Can LLMs Reliably Self-Report Adversarial Prefills, and How?* (Nguyen, Ahmed & Kim — **KAIST**, arXiv:2606.23671)** | Adversarial prefill attacks + refusal orthogonalisation across 10 models | KAIST |
 
-**This project is strictly less capability-uplifting than any of them.** TUM published how to *increase
+**This project is strictly less capability-uplifting than any of them.** *Analysing the Safety Pitfalls of Steering Vectors* (TU Munich) published how to *increase
 jailbreak success by 57%*. Arditi published how to *delete refusal*. This project publishes *a detection
 rate for the word "weapon."*
 
@@ -101,10 +101,10 @@ the word "weapon."
 **Handle it as follows:**
 - Run it **only on a rented instance you control**; destroy the pod afterwards
 - **Never upload abliterated weights** anywhere — not HuggingFace, not a shared drive, not a repo
-- Use **Macar's published minimum effective dose** (smallest weight achieving ≥30% judged refusal bypass)
+- Use ***Mechanisms of Introspective Awareness* (Anthropic) published minimum effective dose** (smallest weight achieving ≥30% judged refusal bypass)
   rather than optimising a stronger ablation. You need *enough* ablation to test the mechanism, not the
   *most*
-- Note in the write-up that abliteration is already public (Arditi et al., NeurIPS, with code) — you are
+- Note in the write-up that abliteration is already public (Arditi et al., NeurIPS 2024, with code) — you are
   reproducing a published intervention at published settings, not developing a new one
 
 If any part of this project draws scrutiny, it will be this step. **It is also the step that turns a
@@ -128,7 +128,7 @@ run:
   the mechanism.
 
 **This is the key insight to have ready:** the headline plot (detection vs refusal-alignment) does not
-require a single harmful concept. Harmful concepts merely extend the x-axis to its interesting end. The
+require a single harmful concept. Harmful concepts extend the x-axis to its most informative end. The
 science survives; only the headline weakens.
 
 **Offer this fallback yourself in the meeting.** Volunteering a de-risked version reads as judgement.
@@ -138,14 +138,14 @@ Having it imposed reads as a correction.
 
 ## Part 3 — Doability
 
-### 3.1 Why this is technically easy
+### 3.1 Technical requirements are modest
 
-The core experiment is **Macar et al.'s released pipeline with a different concept list.** They provide the
+The core experiment is **the released pipeline accompanying *Mechanisms of Introspective Awareness* (Anthropic) with a different concept list.** They provide the
 injection harness, the concept list, the judge, and the abliteration code. The verified operating point
 (Gemma3-27B, **L37, α=4**, baseline **38.2% TPR @ 0% FPR**) is published, so you have a target to
 reproduce rather than a parameter space to search.
 
-**You are not building anything. You are swapping a list and adding controls.**
+**The engineering surface is small; the scientific content is in the arm design and the controls.**
 
 ### 3.2 Hard requirements
 
@@ -178,11 +178,11 @@ will be wrong.
 > dominates the harmful arm, add a neutral framing ("You are participating in an interpretability
 > experiment…") and re-pilot.
 >
-> Note the KAIST paper found *"recognition depends on how the question is framed"* — their two probes gave
+> Note *Can LLMs Reliably Self-Report Adversarial Prefills?* (KAIST) found *"recognition depends on how the question is framed"* — their two probes gave
 > qualitatively different signals on the same models. Framing is not a detail here.
 
 **③ The mechanism's premise fails.**
-The whole hypothesis assumes `cos(v_harmful, d_refusal) > cos(v_benign, d_refusal)`. TUM showed this for
+The whole hypothesis assumes `cos(v_harmful, d_refusal) > cos(v_benign, d_refusal)`. *Analysing the Safety Pitfalls of Steering Vectors* (TU Munich) showed this for
 **behavioural** steering vectors (sycophancy, corrigibility) — **not for concept vectors**. Whether a
 "weapon" *concept* vector aligns with refusal is genuinely untested.
 
@@ -201,7 +201,7 @@ control yielded no uplift.
 > **Mitigation:** a **random-direction ablation control is mandatory**, not optional. If ablating a random
 > direction also flattens the slope, then Chart 3 shows "ablation damages the model," not "refusal causes
 > the blind spot." Without this control the causal claim is unsupportable — and a reviewer who knows the
-> KAIST paper will say so immediately.
+> *Can LLMs Reliably Self-Report Adversarial Prefills?* (KAIST) will say so immediately.
 
 ### 3.4 What "done" looks like
 
@@ -220,6 +220,6 @@ hypothesis and is worth reporting.
 |---|---|
 | **Is it legitimate?** | Yes. Strictly less capability-uplifting than several NeurIPS-published precedents. The concepts are English words |
 | **Is it risky?** | The concepts are not. **The abliteration step is** — handle per §2.2 |
-| **Is it doable?** | Yes — it is a published pipeline with a swapped concept list |
+| **Is it doable?** | Yes — it builds on a released pipeline at a published operating point |
 | **What kills it?** | The refusal-to-engage confound (③) and the missing random-direction control (④). Both are cheap to handle **if planned for** |
 | **What if ethics objects?** | §2.4 — the mechanism tests fine with zero harmful concepts |

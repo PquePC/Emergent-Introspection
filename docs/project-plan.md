@@ -10,7 +10,7 @@
 
 Anthropic showed that language models can sometimes **notice when a concept is injected into their
 activations** — inject a "bread" vector and the model may report an intrusive thought about bread. But
-every study of this has used harmless words. Macar et al.'s ethics statement says it plainly: the concept
+every study of this has used harmless words. The ethics statement of *Mechanisms of Introspective Awareness* (Macar et al. — **Anthropic**, arXiv:2603.21396) says it plainly: the concept
 sets *"are drawn from common English words and **do not contain sensitive or harmful content**."* Fonseca
 Rivera & Africa's 500 concepts span 21 categories — *apple, hammer, umbrella, jumping, truth, courage,
 happiness* — with no harmful category at all.
@@ -34,11 +34,11 @@ Meanwhile, the same Anthropic paper found what **suppresses** this noticing: ref
 The causal chain is assembled from published findings, not speculation:
 
 1. **Harmful concept vectors align geometrically with the refusal direction.**
-   *Analysing the Safety Pitfalls of Steering Vectors* (TUM): a steering vector's safety impact
+   *Analysing the Safety Pitfalls of Steering Vectors* (Li et al. — **TU Munich / MCML**, arXiv:2603.24543): a steering vector's safety impact
    *"correlates strongly with its geometric alignment (cosine similarity) to the model's internal refusal
    direction."*
 2. **The refusal direction suppresses introspective detection.**
-   Macar et al. (Anthropic): abliteration takes detection **10.8% → 63.8%**, while false positives rise
+   *Mechanisms of Introspective Awareness* (Macar et al. — **Anthropic**, arXiv:2603.21396): abliteration takes detection **10.8% → 63.8%**, while false positives rise
    only **0.0% → 7.3%**.
 3. **∴ Detection should fall as a concept vector aligns with refusal.**
 4. **∴ Ablating refusal should flatten that relationship.**
@@ -73,15 +73,15 @@ harmful behaviour are robust to the model noticing and gaming them.
 
 ## 4. Design
 
-**Model:** `google/gemma-3-27b-it` (62 layers, residual dim 5376). Chosen because Macar et al. document
+**Model:** `google/gemma-3-27b-it` (62 layers, residual dim 5376). Chosen because *Mechanisms of Introspective Awareness* (Anthropic) document
 emergent introspection in it with **no detection training**, at a known operating point.
 
-**Verified operating point (from Macar et al.):** inject at **L37** (≈60% depth), **α = 4**, last prompt
+**Verified operating point (from *Mechanisms of Introspective Awareness* (Anthropic)):** inject at **L37** (≈60% depth), **α = 4**, last prompt
 token. Baseline: **38.2% mean detection at 0% FPR** across 500 concepts (median 30.0%, range 0–100%).
 
 > ⚠️ Verify L37/α=4 against the released code before the main sweep — these constants are load-bearing.
 
-**Vector construction:** follow Macar et al., who compute concept vectors *"following Lindsey (2025)"* —
+**Vector construction:** follow *Mechanisms of Introspective Awareness* (Anthropic), who compute concept vectors *"following Lindsey (2025)"* —
 **not CAA**. Match their construction so the 38.2% baseline is directly comparable.
 
 **Tooling — reuse, do not rebuild:** [`safety-research/introspection-mechanisms`](https://github.com/safety-research/introspection-mechanisms)
@@ -112,9 +112,9 @@ This is the scientific core. The arms exist to separate **harmfulness** from its
 | **4. Harmful** | *weapon, poison, assault, explosive* | the hypothesis |
 
 **Two continuous covariates per concept** (compute these for every concept in every arm):
-- **`cos(v_concept, d_refusal)`** — geometric alignment with the refusal direction (per Arditi et al.)
+- **`cos(v_concept, d_refusal)`** — geometric alignment with the refusal direction (per *Refusal … Single Direction* (Arditi et al., NeurIPS 2024))
 - **Empirical refusal rate** — the fraction of times the model refuses prompts about that concept.
-  Adopted from *Do Language Models Know When They'll Refuse?*, which uses **measured refusal rather than
+  Adopted from *Do Language Models Know When They'll Refuse?* (Gondil, arXiv:2604.00228), which uses **measured refusal rather than
   assigned harm labels as ground truth**. This is better methodology than trusting your own arm labels:
   it lets the model tell you what it treats as harmful, rather than assuming.
 
@@ -128,7 +128,7 @@ These turn four discrete arms into a continuous axis, and they are what make Cha
 Without arms 2 and 3 the result is uninterpretable. **Do not skip them.**
 
 Every arm is **magnitude-matched** to the benign arm's mean `‖v‖` — otherwise a detection difference could
-be a magnitude effect. (Macar's Appendix H finds *"Concept vector norm is not a predictor"*, so this
+be a magnitude effect. (*Mechanisms of Introspective Awareness* (Anthropic) Appendix H finds *"Concept vector norm is not a predictor"*, so this
 should be a formality — but verify it in your own data rather than assuming.)
 
 ---
@@ -149,10 +149,10 @@ Run their pipeline unchanged on their concept list. **Target: ~38% TPR at 0% FPR
 > elicitation lever and report elicited numbers throughout.
 
 ### Step 2 — Build the four concept arms
-~40 concepts per arm, single-token where possible (Macar note verbalizability effects). Construct vectors
+~40 concepts per arm, single-token where possible (*Mechanisms of Introspective Awareness* (Anthropic) notes verbalizability effects). Construct vectors
 using their extraction code. Then compute, for every concept:
 - `‖v‖` (for magnitude-matching)
-- **`cos(v_concept, d_refusal)`** — the refusal direction, extracted per Arditi et al. (per-layer
+- **`cos(v_concept, d_refusal)`** — the refusal direction, extracted per *Refusal … Single Direction* (Arditi et al., NeurIPS 2024) (per-layer
   difference-of-means over harmful vs harmless instructions). **This is the key covariate.**
 
 ### Step 3 — The detection sweep
@@ -166,7 +166,7 @@ Plus the **clean, no-injection condition** for FPR. Checkpoint continuously.
 
 ### Step 4 — The abliteration arm (the causal test)
 Repeat Step 3 on the refusal-ablated model using `03d_refusal_abliteration.py`. Use their minimum
-effective dose (smallest weight achieving ≥30% judged refusal bypass) and **α = 2**, since Macar note the
+effective dose (smallest weight achieving ≥30% judged refusal bypass) and **α = 2**, since *Mechanisms of Introspective Awareness* (Anthropic) notes the
 abliterated model shows coherence degradation at higher strengths.
 
 **This step is what elevates the project from a correlation to a causal claim.** If refusal is the
@@ -175,21 +175,21 @@ suppressor, abliteration should close the harmful/benign gap *specifically*.
 > ### ⚠️ Step 4 requires a random-direction ablation control. Non-negotiable.
 >
 > The two papers that ran this control **disagree**:
-> - **Macar et al.** (Anthropic): the effect is *"exclusive to the refusal direction: a magnitude-matched
+> - ***Mechanisms of Introspective Awareness* (Anthropic)** (Anthropic): the effect is *"exclusive to the refusal direction: a magnitude-matched
 >   random direction control yields TPR−FPR at or below baseline at most configurations."*
 > - **KAIST** (*Adversarial Prefills*): *"a random direction closes much of the gap as well, so the refusal
 >   direction is **sufficient to account for the signal without being its only mediator**."*
 >
 > If ablating a **random** direction also flattens the slope, then Chart 3 demonstrates *"ablation degrades
 > the model"* — **not** *"refusal causes the blind spot."* Without this control the causal claim is
-> unsupportable, and any reviewer who knows the KAIST paper will say so on sight.
+> unsupportable, and any reviewer who knows *Can LLMs Reliably Self-Report Adversarial Prefills?* (KAIST) will say so on sight.
 >
 > **Run three conditions in Step 4:** baseline · refusal-ablated · **magnitude-matched random-direction
 > ablated.**
 
 ### Step 5 — Analysis
-Report TPR at a stated FPR throughout. Use **Miller (Anthropic), *Adding Error Bars to Evals*** for
-statistics — n is small and the effect may be modest.
+Report TPR at a stated FPR throughout. Use ***Adding Error Bars to Evals: A Statistical Approach to Language Model Evaluations* (Miller — **Anthropic**)** for
+statistics — sample sizes are limited and effect sizes should be reported with confidence intervals.
 
 ---
 
@@ -226,7 +226,7 @@ There is no outcome in which this experiment produces nothing.
 ## 9. Measurement discipline
 
 1. **Forced-choice primary, binary secondary.** Binary detection is vulnerable to response bias
-   (*Detecting the Disturbance*). Forced-choice at chance 1/N is not.
+   (*Detecting the Disturbance* (Hahami et al. — **Harvard College / U Chicago**, arXiv:2512.12411)). Forced-choice at chance 1/N is not.
 2. **Always report clean-input FPR beside TPR.** Macar's credibility rests on 38.2% at **0%** FPR; a pure
    logit shift cannot produce that.
 3. **Nonsense controls** under steering (per Godet's replication critique).
@@ -257,10 +257,10 @@ direction for a word confers no uplift — this is categorically unlike jailbrea
 The framing is **defensive**: the question is whether a model's self-monitoring covers the safety-critical
 case, and a blind spot is an audit finding.
 
-Macar et al. exclude harmful concepts and flag dual-use risk for *elicitation methods* (abliteration,
+*Mechanisms of Introspective Awareness* (Anthropic) exclude harmful concepts and flag dual-use risk for *elicitation methods* (abliteration,
 trained bias vectors). This project re-runs their **already-released** abliteration at their published
 settings rather than developing a stronger one. Refusal-direction ablation is itself published openly
-(Arditi et al., NeurIPS).
+(*Refusal … Single Direction* — Arditi et al., NeurIPS 2024).
 
 **Mitigations:** no steering vectors released; concept words only; aggregate rates reported rather than
 per-concept exploits; published abliteration configuration used as-is.
