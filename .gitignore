@@ -1,6 +1,9 @@
 # Private working documents — local only, not for upstream
 private/
 
+# Private, author-specific Claude instructions (auto-loaded locally, never shipped)
+CLAUDE.local.md
+
 # Python
 __pycache__/
 *.py[cod]
