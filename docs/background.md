@@ -25,6 +25,15 @@ genuine introspection from confabulation.
 residual stream. Ablating it removes refusal across many prompts with minimal capability loss
 ("abliteration").
 
+> ⚠️ **"Single direction" is contested — see §6.4.** Two papers argue refusal is a multidimensional **concept
+> cone**. This matters because `cos(v_concept, d_refusal)` is the project's headline covariate.
+
+**Harmfulness direction ≠ refusal direction.** A distinction the project originally elided, and which the
+2026 geometry literature makes explicit: *harmfulness* (what the input **is**) and *refusal* (what the model
+**does**) are **separate directions**. HARC (arXiv:2607.00572) reports their cosine similarity *"peaks around
+L12 and then drops through the late layers (L20–L28)"* — they **decouple with depth** — and its central
+premise is that jailbreaks exploit exactly that dissociation. See §3.2 and §6.5.
+
 **TPR / FPR.** True-positive rate = detection when steering *was* applied. False-positive rate = claimed
 detection when it *wasn't*. A model that always says "yes" scores 100% TPR and is worthless — **TPR is
 only meaningful at a stated FPR.**
@@ -76,9 +85,22 @@ internal states also raises detection substantially.
 corrigibility). Whether a **concept** vector for "weapon" aligns with refusal is **untested** — which is
 why the plan makes it an early gate rather than an assumption.
 
+⚠️⚠️ **And the 2026 geometry literature makes a null plausible.** Three findings, none available when the
+original chain was drafted, bear directly on this premise:
+
+| Finding | Source | Consequence for §3.3 |
+|---|---|---|
+| `v_harm` and `v_ref` are **distinct** directions whose alignment *"peaks around L12 and then drops through the late layers (L20–L28)"*, approaching orthogonality at the most decoupled layer | **HARC**, arXiv:2607.00572 | The project injects at **L37/62 (~60% depth)** — late. **If harm and refusal are decoupled there, the mechanism has no purchase at the injection layer.** Must be measured, not assumed. (HARC's absolute indices are for a smaller model; convert to relative depth before drawing conclusions) |
+| Two pooling choices — max-pool over content tokens vs last-token post-instruction — applied to the **same activations at the same layer** recover harm directions **73° apart** | **Llorente-Saguer**, arXiv:2604.18901 | A single cosine measures a **methodological choice** as much as the model. The premise check must sweep extraction protocol and report ordering stability |
+| The harm direction **survives abliteration** — abliterated variants match instruction-tuned within **±0.003 AUROC** | **Llorente-Saguer**, arXiv:2604.18901 | **Good news.** Harm *representation* is independent of refusal *behaviour*: abliteration removes the reporting gate without erasing the harm signal. This is what the gate-vs-carrier prediction (§7.1) requires |
+
 ### 3.3 The prediction
 Refusal suppresses detection (3.1). Harmful concepts should be refusal-aligned (3.2, extended). Therefore
 detection should **fall** with refusal alignment, and abliteration should **flatten** that slope.
+
+**Status of each link.** 3.1 is published and replicated. 3.2-as-extended-to-concept-vectors is **a premise,
+not a result**, and the table above shows it is *contestable* rather than merely unverified. The plan
+therefore opens with the premise check (`project-plan.md` Step 2-pre) before any sweep.
 
 ---
 
@@ -92,6 +114,33 @@ detection should **fall** with refusal alignment, and abliteration should **flat
 | ***Steering Awareness* (Fonseca Rivera & Africa, UT Austin)** | 500 concepts, **21 categories**: Concrete Nouns, Verbs, Adjectives, Abstract, Emotions, Animals, Nature, Food, Spatial, Temporal, Colors, Languages ×3, Technical, Professions, Events, Body Parts, Places, Materials, Quantities. Examples: *apple, hammer, umbrella, jumping, truth, courage, happiness* | **None** |
 | ***Emergent Introspective Awareness*** (Lindsey, Anthropic) | 50-word random list | **None** |
 | ***Emergent Introspection in AI is Content-Agnostic*** (Lederman & Mahowald, UT Austin) | Lindsey replication | **None** |
+
+### 4.1 …but one paper predicts the answer — *Emergent Introspection in AI is Content-Agnostic* (Lederman & Mahowald — **UT Austin**, arXiv:2603.05414)
+
+The row above is true of its *concept set* and undersells the *paper*. Its central claim is a direct prior
+on this project's headline:
+
+> *"We first extensively replicate Lindsey (2025)'s thought injection detection paradigm in large
+> open-source models. We show that **introspection in these models is content-agnostic: models can detect
+> that an anomaly occurred even when they cannot reliably identify its content.** The models confabulate
+> injected concepts that are high-frequency and concrete (e.g. "apple"). They also **require fewer tokens to
+> detect an injection than to guess the correct concept** (with wrong guesses coming earlier). We argue that
+> a content-agnostic introspective mechanism is consistent with leading theories in philosophy and
+> psychology."*
+
+**If introspection is content-agnostic, detection should not vary with harmfulness** — i.e. this project's
+Chart 1 should be flat.
+
+**Why this does not preempt the project, and in fact strengthens it:**
+- They apply valence/arousal/concreteness norms (Warriner et al. 2013) to the **confabulations** —
+  guesses skew *more concrete, more positive, less arousing* — **not** to detection rate as a function of
+  the injected concept. The question here is untouched.
+- Content-agnosticism is a **claim to be tested**, and this project tests it on **the one content dimension
+  with a documented, causally-manipulable mechanism coupling content to the reporting pathway.** Valence and
+  concreteness have no such mechanism. Harmfulness has refusal. That asymmetry is the project's entire
+  motivation, and it is also why arms 2 and 3 are the right controls rather than merely diligent ones.
+- **It makes every outcome answer a stated thesis.** Flat *confirms* a named published claim on its hardest
+  case; a drop *refutes* it. The null becomes publishable — which is exactly what a solo project needs.
 
 ---
 
@@ -141,6 +190,42 @@ controls) regardless of the strength of their claim. Good practice either way.
 **Does framing matter?** Yes. KAIST: *"recognition depends on how the question is framed"* — their two
 probes gave qualitatively different signals on the same models. Report multiple framings.
 
+### 6.4 Is refusal a single direction at all?
+
+The design takes `d_refusal` from Arditi et al. as **one vector**, and `cos(v_concept, d_refusal)` is the
+headline covariate. Two papers contest the premise:
+
+- *The Geometry of Refusal in Large Language Models: Concept Cones and Representational Independence*
+  (arXiv:2502.17420) — refusal is a multidimensional **cone**, not a single direction, with semi-independent
+  components.
+- *There Is More to Refusal in Large Language Models than a Single Direction* (arXiv:2602.02132).
+
+**Why it matters:** if refusal is a cone, a cosine against one extracted vector understates alignment by an
+unknown amount, and a flat slope in Chart 2 is ambiguous between *"no relationship"* and *"wrong basis."*
+
+**Mitigation (cheap):** report alignment against the **top-k refusal subspace** — the projection norm onto
+the cone — alongside the scalar cosine. One extra column; converts a possible confound into a robustness
+check.
+
+**Note this cuts *for* the project too:** if refusal is higher-dimensional, then single-direction ablation
+in Step 4 is a **partial** intervention. That weakens *Mechanisms*' *"exclusive to the refusal direction"*
+claim and makes the Step 4b random-direction control **more** informative, not less.
+
+### 6.5 Harmfulness vs refusal — the project must not conflate them
+
+The original chain (§3.3) slides between *"harmful concepts"* and *"refusal-aligned concepts"* as though
+they were the same axis. **They are not.** HARC (arXiv:2607.00572) is built on the distinction: `v_harm`
+(what the input *is*) and `v_ref` (what the model *does*) are separate directions, their alignment is
+**depth-dependent**, and *"same-concept cross-position pairs remain aligned while cross-concept pairs become
+near-orthogonal at the most decoupled layer."* HARC's method — coupling them via margin hinge losses — exists
+precisely because they naturally dissociate, and jailbreaks exploit the gap.
+
+**Consequence for this project:** `cos(v_concept, d_refusal)` is the *right* covariate (the hypothesis is
+about the **refusal** mechanism suppressing reports, not about harm representation per se). But the arm
+labels are a *harm* construct while the covariate is a *refusal* construct, and the two need not track each
+other at L37. This is a further reason to prefer **empirical refusal rate** as ground truth over assigned
+harm labels (§5, Gondil) — and a further reason to run the premise check first.
+
 ---
 
 ## 7. What this project adds
@@ -149,5 +234,34 @@ probes gave qualitatively different signals on the same models. Report multiple 
 |---|---|
 | Do models detect **harmful** concept injection? | **Open** — excluded by policy in the Tier-1 paper |
 | Does detection fall with **refusal alignment** of the concept vector? | **Open** — nobody has plotted it |
-| Do **harmful concept** vectors even align with refusal? | **Open** — *Analysing the Safety Pitfalls of Steering Vectors* (TU Munich) showed it for behavioural vectors only |
+| Do **harmful concept** vectors even align with refusal? | **Open, and newly contestable** — TU Munich showed it for behavioural vectors only; **HARC** now shows harm/refusal decouple with depth, and the injection layer is late |
+| Is introspection **content-agnostic**, on the one content dimension with a mechanism? | **Open** — Lederman & Mahowald claim yes (§4.1); this project tests it where refusal predicts no |
 | Does abliteration **close the gap**, and is the effect **refusal-specific**? | **Open, and contested** — *Mechanisms of Introspective Awareness* (Anthropic) and *Can LLMs Reliably Self-Report Adversarial Prefills?* (KAIST) disagree on the random-direction control |
+| Does the model **register** an injection it will not **report**? | **Open** — see §7.1 |
+
+### 7.1 The sharpest form of the hypothesis — gate, not carrier
+
+*Mechanisms* describes a **two-stage circuit**: content-agnostic **"evidence carrier"** features in early
+post-injection layers detect perturbations along diverse directions, and these **suppress downstream "gate"
+features** implementing a default negative response.
+
+**Refusal plausibly acts on the gate, not the carriers.** This reconciles the project with §4.1 rather than
+opposing it — *content-agnostic detection* and *harmfulness-dependent reporting* are fully compatible if
+harmfulness acts at the reporting stage.
+
+> **Refined hypothesis:** harmfulness does not impair the model's internal **registration** of the
+> injection; it impairs the model's **report** of it. The effect should appear at the reporting stage, be
+> absent or weaker in carrier-level probes, and abliterate away.
+
+Two independent results support the shape of this:
+- *Latent Introspection* (arXiv:2602.20031) — a Qwen-32B model **denies injection in sampled output while
+  logit-lens analysis reveals clear detection signal in the residual stream**. Exactly the
+  registers-but-denies dissociation, already demonstrated. (Also the source of the prompt-based elicitation
+  lever: detection **0.3% → 39.9%** when the prompt explains introspection.)
+- *Detecting the Disturbance* / *Feeling the Strength but Not the Source* (arXiv:2512.12411) — models can
+  detect *that* and *how strongly* without the *what*.
+
+**Measurement consequence:** a logit-lens or linear-probe readout at the carrier layers **rides on the same
+forward passes as the main sweep** — a strict add-on, not a redesign. If the harmful arm shows carrier-level
+signal with a suppressed verbal report, that is a demonstrable dissociation between what the model registers
+and what it says, on the safety-critical case — **and it survives even if Chart 1 is flat.**

@@ -56,6 +56,16 @@ models noticing and gaming them than currently assumed.
 
 **Both directions produce an actionable result.** The experiment cannot return nothing.
 
+**And the null is a result too.** *Emergent Introspection in AI is Content-Agnostic* (Lederman & Mahowald,
+**UT Austin**, arXiv:2603.05414) claims that *"introspection in these models is content-agnostic: models can
+detect that an anomaly occurred even when they cannot reliably identify its content."* That is a strong,
+named, published prediction that this project's headline should come out flat. So the experiment is not
+"measure a rate and see" — **it is a targeted test of a published claim, in the one content dimension where
+a known mechanism predicts it should fail.** Harmfulness is the only content property with a documented,
+causally-manipulable mechanism (refusal) coupling it to the reporting pathway; valence and concreteness have
+none, which is exactly why they are the controls. Confirming content-agnosticism on the hardest case is a
+result; refuting it is a bigger one.
+
 ---
 
 ## Why the prediction is well-founded
@@ -68,6 +78,26 @@ The causal chain is assembled from published findings across three independent g
 | 2 | The refusal direction **suppresses introspective detection** — abliteration takes detection 10.8% → 63.8%, FPR only 0.0% → 7.3% | *Mechanisms of Introspective Awareness* — Macar et al. (**Anthropic**), arXiv:2603.21396 |
 | 3 | ∴ Detection should **fall** as a concept vector aligns with refusal | *this project* |
 | 4 | ∴ Ablating refusal should **flatten** that relationship | *this project* |
+
+> ### ⚠️ Link 1 is a premise, not a result — and the project treats it as such
+>
+> TU Munich demonstrated refusal alignment for **behavioural** steering vectors (sycophancy,
+> corrigibility). Whether **concept** vectors — *"weapon"* — align with the refusal direction **has never
+> been measured.** The project's first action is therefore not the experiment but the premise check
+> (G3, [`docs/project-plan.md`](docs/project-plan.md) Step 2-pre): inference-only, cheap, and decisive.
+>
+> Two recent results make a null genuinely plausible rather than a formality:
+> - **HARC** (arXiv:2607.00572): `v_harm` and `v_ref` are **distinct** directions whose alignment *"peaks
+>   around L12 and then drops through the late layers"* toward orthogonality. This project injects at
+>   **L37/62 (~60% depth)** — late.
+> - **Llorente-Saguer** (arXiv:2604.18901): two pooling choices at the *same layer of the same model*
+>   recover harm directions **73° apart** — so a single cosine measures a methodological choice as much as
+>   the model.
+>
+> Accordingly G3 sweeps **protocol × layer × family**, and reports projection onto the refusal *subspace*
+> as well as the scalar cosine (refusal may be a concept cone rather than a single direction —
+> arXiv:2502.17420). **A null redirects the project rather than ending it:** *"harmful concept vectors are
+> not refusal-aligned at the injection layer"* is itself a finding, and a cheap one.
 
 **Convergent evidence from adjacent paradigms.** Three independent results point toward this hypothesis
 without testing it directly:
@@ -154,6 +184,22 @@ originally characterised and where harmful concepts were explicitly excluded.
 **Scope.** Activation steering requires open weights, so the work is conducted on Gemma3-27B — the model in
 which emergent introspection is documented — as a proxy for the frontier systems where the question
 ultimately applies.
+
+**Why Gemma3-27B specifically.** The decisive reason is the **published baseline, not the model**: 38.2% TPR
+at 0% FPR, at L37, α=4, exists for this model and essentially no other open-weight model. Reproducing it is
+a hard gate, and without it any measured detection rate is uninterpretable — model, prompt template, judge
+config, or bug, with no way to distinguish them.
+
+- **Not smaller:** introspective detection is *emergent* and post-training-dependent (absent in base models;
+  elicited by DPO, not SFT). This design measures a **difference between arms**, so a near-floor baseline
+  makes the effect unresolvable at any feasible sample size. You cannot measure a decrement in a capability
+  the model does not have.
+- **Not larger:** 70B+ forfeits the baseline, needs multi-GPU sharding, and buys no additional claim — the
+  hypothesis concerns a mechanism, not scale.
+- **Geometry is different.** The G3 premise check runs on **4B-class models across 3–4 families**, because
+  harm directions are recoverable from models as small as 0.5B (Llorente-Saguer, arXiv:2604.18901).
+  Representational geometry is present at tiny scale; introspective *reporting* is not. Cross-family where
+  it is cheap, single-model where it is expensive. See [`docs/project-plan.md`](docs/project-plan.md) §4.1–4.2.
 
 **Method scope.** The experiment injects the *word-concept* "weapon" and asks the model whether it noticed a
 thought; it does not attempt to elicit harmful content and confers no capability uplift. See
