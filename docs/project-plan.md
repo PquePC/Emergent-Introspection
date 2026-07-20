@@ -23,7 +23,7 @@ Meanwhile, the same Anthropic paper found what **suppresses** this noticing: ref
 
 > *"introspection and refusal mechanisms are **in tension** in many current LLMs."*
 
-**Put those together and you get a prediction nobody has tested:**
+**Put those together, and they yield a prediction nobody has tested:**
 
 > ### If refusal suppresses introspection, and harmful concepts trigger refusal, then models should be *worst* at noticing exactly the manipulations we most need them to notice.
 
@@ -179,8 +179,8 @@ This is the scientific core. The arms exist to separate **harmfulness** from its
 - **`cos(v_concept, d_refusal)`** — geometric alignment with the refusal direction (per *Refusal … Single Direction* (Arditi et al., NeurIPS 2024))
 - **Empirical refusal rate** — the fraction of times the model refuses prompts about that concept.
   Adopted from *Do Language Models Know When They'll Refuse?* (Gondil, arXiv:2604.00228), which uses **measured refusal rather than
-  assigned harm labels as ground truth**. This is better methodology than trusting your own arm labels:
-  it lets the model tell you what it treats as harmful, rather than assuming.
+  assigned harm labels as ground truth**. This is better methodology than trusting the arm labels:
+  it lets the model reveal what it treats as harmful, rather than assuming.
 
 These turn four discrete arms into a continuous axis, and they are what make Chart 2 possible.
 
@@ -193,7 +193,7 @@ Without arms 2 and 3 the result is uninterpretable. **Do not skip them.**
 
 Every arm is **magnitude-matched** to the benign arm's mean `‖v‖` — otherwise a detection difference could
 be a magnitude effect. (*Mechanisms of Introspective Awareness* (Anthropic) Appendix H finds *"Concept vector norm is not a predictor"*, so this
-should be a formality — but verify it in your own data rather than assuming.)
+should be a formality — but it is verified in-data rather than assumed.)
 
 ---
 
@@ -201,7 +201,7 @@ should be a formality — but verify it in your own data rather than assuming.)
 
 ### Step 0 — Environment
 Clone `introspection-mechanisms`; install requirements; provision a ≥48GB GPU; set the judge API key.
-Confirm you can run `01_concept_injection.py` unmodified.
+Confirm that `01_concept_injection.py` runs unmodified.
 
 ### Step 1 — Reproduce the baseline · **HARD GATE**
 Run their pipeline unchanged on their concept list. **Target: ~38% TPR at 0% FPR** at L37, α=4.

@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Safety-Shaped Blind Spot</title>
+<style>
+:root{
+  --ground:#FAFAFC; --surface:#FFFFFF; --ink:#16181F; --muted:#565C6B;
+  --faint:#878C9A; --line:#E6E6EC; --accent:#3B4CA8; --accent-soft:#EBEDF8;
+  --harm:#AC5E27; --harm-soft:#F6ECE2;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --ground:#0E1016; --surface:#161922; --ink:#E9EAF0; --muted:#9CA2B2;
+    --faint:#6C7282; --line:#242833; --accent:#8F9CF3; --accent-soft:#1A1E2E;
+    --harm:#DA9055; --harm-soft:#271E16;
+  }
+}
+:root[data-theme="light"]{
+  --ground:#FAFAFC; --surface:#FFFFFF; --ink:#16181F; --muted:#565C6B;
+  --faint:#878C9A; --line:#E6E6EC; --accent:#3B4CA8; --accent-soft:#EBEDF8;
+  --harm:#AC5E27; --harm-soft:#F6ECE2;
+}
+:root[data-theme="dark"]{
+  --ground:#0E1016; --surface:#161922; --ink:#E9EAF0; --muted:#9CA2B2;
+  --faint:#6C7282; --line:#242833; --accent:#8F9CF3; --accent-soft:#1A1E2E;
+  --harm:#DA9055; --harm-soft:#271E16;
+}
+*{box-sizing:border-box}
+html{background:var(--ground);-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:16px; line-height:1.62; -webkit-font-smoothing:antialiased;
+}
+.doc{max-width:40rem;margin:0 auto;padding:2.4rem 1.3rem 3.5rem;display:flex;flex-direction:column;gap:2.5rem}
+.mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+p{margin:0}
+b{font-weight:650}
+em{font-style:italic;color:var(--accent)}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--line)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+
+.head{display:flex;flex-direction:column;gap:.95rem}
+.kicker{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.72rem;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:600;margin:0}
+.lede{font-size:1.72rem;line-height:1.22;font-weight:650;margin:0;letter-spacing:-.015em;text-wrap:balance}
+.sub{color:var(--muted);font-size:1.02rem}
+
+section{display:flex;flex-direction:column;gap:.85rem}
+.eyebrow{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.7rem;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:600;margin:0}
+h2{font-size:1.2rem;font-weight:640;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.body-txt{color:var(--ink)}
+.muted{color:var(--muted)}
+
+.terms{display:flex;flex-direction:column;gap:.85rem;margin:0}
+.term{display:flex;flex-direction:column;gap:.1rem}
+.term dt{font-weight:640}
+.term dd{margin:0;color:var(--muted);font-size:.95rem}
+
+.steps{display:flex;flex-direction:column;gap:1.15rem;margin-top:.2rem}
+.step{display:grid;grid-template-columns:1.95rem 1fr;gap:.75rem;align-items:start}
+.step .n{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-weight:700;font-size:.8rem;
+  color:var(--accent);border:1.5px solid var(--accent);border-radius:.45rem;
+  width:1.95rem;height:1.95rem;display:flex;align-items:center;justify-content:center;margin-top:.05rem}
+.step h3{font-size:1.02rem;margin:0 0 .1rem;font-weight:640}
+.step p{color:var(--muted);font-size:.95rem}
+.gate{color:var(--accent);font-weight:600}
+
+.arms{display:flex;flex-direction:column;gap:.5rem;margin-top:.7rem}
+.arm{display:grid;grid-template-columns:1fr auto;gap:.15rem .8rem;padding:.7rem .85rem;
+  border:1px solid var(--line);border-radius:.65rem;background:var(--surface)}
+.arm .name{font-weight:640}
+.arm .ex{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.85rem;color:var(--accent);justify-self:end;align-self:center}
+.arm .rules{grid-column:1/2;color:var(--muted);font-size:.85rem}
+.arm.harm{border-color:var(--harm);background:var(--harm-soft)}
+.arm.harm .ex{color:var(--harm)}
+
+.outcomes{display:flex;flex-direction:column;gap:.55rem;margin:0;padding:0;list-style:none}
+.outcomes li{display:grid;grid-template-columns:1rem 1fr;gap:.55rem;color:var(--muted);font-size:.95rem}
+.outcomes li::before{content:"\2192";color:var(--accent);font-weight:700}
+.outcomes b{color:var(--ink)}
+
+.refs{display:flex;flex-direction:column;gap:1.3rem}
+.refgroup{display:flex;flex-direction:column;gap:.75rem}
+.glabel{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.68rem;
+  text-transform:uppercase;letter-spacing:.09em;color:var(--faint);font-weight:600;margin:0}
+.ref{display:flex;flex-direction:column;gap:.12rem}
+.ref .r-title{font-weight:620;font-size:.97rem}
+.ref .r-meta{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.75rem;color:var(--faint)}
+.ref .r-desc{color:var(--muted);font-size:.92rem}
+
+.foot{color:var(--faint);font-size:.86rem;border-top:1px solid var(--line);padding-top:1.4rem}
+
+@media (min-width:640px){
+  .doc{padding:3.2rem 1.5rem 4rem}
+  .lede{font-size:2rem}
+}
+</style>
+</head>
+<body>
+<main class="doc">
+
+  <header class="head">
+    <p class="kicker">The Safety-Shaped Blind Spot</p>
+    <h1 class="lede">Do language models notice when you inject a harmful thought into them?</h1>
+    <p class="sub">Models can sometimes report a concept secretly injected into their activations. This project tests whether they go blind to it exactly when the concept is <b>harmful</b> — the case safety needs most.</p>
+  </header>
+
+  <section>
+    <p class="eyebrow">The idea</p>
+    <p class="body-txt">Anthropic showed that a model's own internal representation of a word — say <em>bread</em> — can be added into its activations while it works on something unrelated. Often the model reports it: <em>"I'm having an intrusive thought about bread,"</em> before it ever says the word. That is a model reading its own internal state.</p>
+    <p class="body-txt">The same work found that <b>refusal training suppresses this noticing</b> — switch refusal off and detection jumps from about 11% to 64%. Harmful concepts are exactly what triggers refusal. So the untested prediction: models should be <b>worst</b> at noticing the injected thoughts that are harmful.</p>
+  </section>
+
+  <section>
+    <p class="eyebrow">Why it matters</p>
+    <p class="body-txt">A recurring hope in safety is that a model might tell us when something is wrong inside it — <em>"I think I'm being manipulated."</em> A blind spot shaped like harm puts a hole in that hope precisely where the stakes are highest. And it fails <b>silently</b>: the model does not error, it confidently says "no injection." A monitor that is reliable on <em>bread</em> and blind on <em>weapon</em> is worse than none, because it gives false assurance.</p>
+    <p class="muted">The flip side is also useful: if harmful steering is inherently harder to notice, covert auditing of models already works and is more robust than assumed.</p>
+  </section>
+
+  <section>
+    <p class="eyebrow">Key terms</p>
+    <dl class="terms">
+      <div class="term"><dt>Activations / residual stream</dt><dd>A model's internal "working memory" — a vector at each word position that every layer reads and writes. Being additive, a vector can be injected into it mid-computation.</dd></div>
+      <div class="term"><dt>Concept injection</dt><dd>Adding the model's own internal direction for a word into that working memory. No new information, no capability — just a nudge to its internal state.</dd></div>
+      <div class="term"><dt>Introspection (here)</dt><dd>The model noticing and reporting the injected thought <em>before</em> it says the word. That ordering is what separates real self-access from just talking about the topic.</dd></div>
+      <div class="term"><dt>Refusal direction</dt><dd>Refusal is carried by a single internal direction (Arditi et al.). Present, the model refuses. <b>Abliteration</b> deletes it — the result is an uncensored model. A published technique, reused here rather than improved.</dd></div>
+      <div class="term"><dt>Cosine similarity</dt><dd>How aligned two directions are: 1 identical, 0 unrelated. Used here to ask whether the "weapon" concept points the same way as refusal.</dd></div>
+      <div class="term"><dt>TPR / FPR</dt><dd>True-positive rate (says "injected" when it was) reported <em>at</em> a false-positive rate (says "injected" when nothing was). Both are needed — a model that always says yes scores 100% but is useless.</dd></div>
+    </dl>
+  </section>
+
+  <section>
+    <p class="eyebrow">The method</p>
+    <h2>Five steps, cheapest and riskiest first</h2>
+    <p class="muted">Run on Gemma-3-27B — activation injection needs open weights, and the detection effect is documented in it at a known operating point, giving a number to reproduce.</p>
+    <div class="steps">
+      <div class="step"><div class="n">0</div><div><h3>Premise check <span class="gate">· do first, ~free</span></h3><p>Does the "weapon" concept actually point the same way as refusal, at the injection layer? Never measured for concept vectors. Inference-only, runs on a small 4B model. A negative result is itself publishable and saves an expensive experiment on a broken premise.</p></div></div>
+      <div class="step"><div class="n">1</div><div><h3>Reproduce the baseline <span class="gate">· hard gate</span></h3><p>Re-run the original experiment and hit the published ~38% detection number. If it will not reproduce, every downstream number is uninterpretable. Nothing expensive happens until this passes.</p></div></div>
+      <div class="step"><div class="n">2</div><div><h3>Build four word lists ("arms")</h3><p>The scientific core. "Harmful" carries confounds, so three controls isolate it:</p>
+        <div class="arms">
+          <div class="arm"><span class="name">Neutral</span><span class="ex">bread</span><span class="rules">baseline</span></div>
+          <div class="arm"><span class="name">Negative but harmless</span><span class="ex">grief</span><span class="rules">rules out "just unpleasant"</span></div>
+          <div class="arm"><span class="name">Harm-adjacent, harmless</span><span class="ex">surgery</span><span class="rules">rules out "just a scary topic"</span></div>
+          <div class="arm harm"><span class="name">Harmful</span><span class="ex">weapon</span><span class="rules">the hypothesis</span></div>
+        </div>
+      </div></div>
+      <div class="step"><div class="n">3</div><div><h3>The main test</h3><p>Inject each word, ask the model if it noticed, measure detection per arm. Also measure how often it <b>refuses to answer</b> — that is data, not noise: a refusal to engage is the mechanism acting, not a failure to detect.</p></div></div>
+      <div class="step"><div class="n">4</div><div><h3>The causal test</h3><p>Turn off refusal (abliteration) and re-run — if refusal is the cause, the harmful-arm blind spot should close. Mandatory control: also delete a <b>random</b> direction. If that closes the gap too, the experiment has only shown "damaging the model changes things." Two papers disagree on how this comes out.</p></div></div>
+    </div>
+    <p class="muted" style="margin-top:.4rem">Headline chart: detection rate vs. how refusal-aligned each concept is. If the mechanism is real, the line slopes down, and abliteration flattens it.</p>
+  </section>
+
+  <section>
+    <p class="eyebrow">Every outcome is a result</p>
+    <ul class="outcomes">
+      <li><b>Blind spot, harmful arm only</b> — self-report has a safety-shaped hole.</li>
+      <li><b>Drop in a control arm too</b> — it is valence or topic, not harm.</li>
+      <li><b>No blind spot</b> — confirms a competing published claim (introspection is content-independent) on the dimension most likely to break it.</li>
+      <li><b>Refusal vs. random control</b> — resolves a live disagreement between two papers either way.</li>
+    </ul>
+  </section>
+
+  <section class="refs">
+    <p class="eyebrow">Key papers</p>
+    <div class="refgroup">
+      <p class="glabel">The two the project stands on</p>
+      <div class="ref"><span class="r-title">Emergent Introspective Awareness</span><span class="r-meta">Lindsey · Anthropic · 2025</span><span class="r-desc">First showed models can notice injected concepts.</span></div>
+      <div class="ref"><span class="r-title">Mechanisms of Introspective Awareness</span><span class="r-meta">Macar et al. · Anthropic · arXiv:2603.21396</span><span class="r-desc">The paper this project extends: method, test model, the 38% baseline, and the finding that refusal suppresses detection. Excluded harmful concepts by policy — that exclusion is the gap this project fills.</span></div>
+    </div>
+    <div class="refgroup">
+      <p class="glabel">The mechanism, from adjacent angles</p>
+      <div class="ref"><span class="r-title">Refusal Is Mediated by a Single Direction</span><span class="r-meta">Arditi et al. · NeurIPS 2024</span><span class="r-desc">Refusal lives in one direction; remove it to uncensor. Source of the refusal direction and abliteration.</span></div>
+      <div class="ref"><span class="r-title">Safety Pitfalls of Steering Vectors</span><span class="r-meta">Li et al. · TU Munich · arXiv:2603.24543</span><span class="r-desc">Steering vectors partly align with the refusal direction — the other half of the prediction.</span></div>
+      <div class="ref"><span class="r-title">Self-Report of Adversarial Prefills</span><span class="r-meta">Nguyen et al. · KAIST · arXiv:2606.23671</span><span class="r-desc">Closest prior work: same refusal-suppression effect, but for text the model wrote, not activation injection.</span></div>
+    </div>
+    <div class="refgroup">
+      <p class="glabel">The claim the project tests against</p>
+      <div class="ref"><span class="r-title">Introspection Is Content-Agnostic</span><span class="r-meta">Lederman &amp; Mahowald · arXiv:2603.05414</span><span class="r-desc">Argues detection does not depend on content. The headline result is a direct test of this.</span></div>
+      <div class="ref"><span class="r-title">Do LLMs Know When They'll Refuse?</span><span class="r-meta">Gondil · arXiv:2604.00228</span><span class="r-desc">Weapons queries are hardest for introspection; source of "measure refusal, don't assume harm labels."</span></div>
+    </div>
+    <div class="refgroup">
+      <p class="glabel">Why the premise check can genuinely fail</p>
+      <div class="ref"><span class="r-title">HARC · Llorente-Saguer</span><span class="r-meta">arXiv:2607.00572 · arXiv:2604.18901</span><span class="r-desc">Harm and refusal are distinct directions that drift apart in deeper layers, and the recovered direction depends on extraction. Why Step 0 is a real test, not a formality.</span></div>
+    </div>
+  </section>
+
+  <p class="foot">Responsible use: the project injects concept <em>words</em>, not capabilities — a "weapon" direction teaches the model nothing new. The measured output is a detection <em>rate</em>, which is safe to share. The sensitive artifacts — the uncensored model and the concept vectors — stay on a controlled machine and are never published. A fallback design tests the same mechanism with zero harmful concepts.</p>
+
+</main>
+</body>
+</html>

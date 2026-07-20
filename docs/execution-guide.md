@@ -3,9 +3,9 @@
 ### *A step-by-step runbook. What to set up, what to run, what to expect, and what to do when it breaks.*
 
 > This is the **operational companion** to [`project-plan.md`](project-plan.md). The plan says *what* the
-> experiment is and *why* each control exists; this file says *how to actually run it*, in order, on your
-> own machine and a rented GPU. Read the plan first — this guide assumes you know the four-arm design, the
-> gates (G1–G4), and the operating point (L37, α=4).
+> experiment is and *why* each control exists; this file says *how to actually run it*, in order, on a
+> local machine and a rented GPU. Read the plan first — this guide assumes familiarity with the four-arm
+> design, the gates (G1–G4), and the operating point (L37, α=4).
 >
 > **Before any release-shaped action** (push, upload, opening a pod port), the dual-use rules in
 > [`../CLAUDE.md`](../CLAUDE.md) are binding. They are folded into the relevant stages below and collected
@@ -20,7 +20,7 @@ runs until a cheaper gate has cleared it.
 
 | Stage | What | Where it runs | Gate it clears | Rough time |
 |---|---|---|---|---|
-| **0** | Local environment + smoke test | Your laptop / any box | Code runs at all | 1–2 h |
+| **0** | Local environment + smoke test | Local machine / any box | Code runs at all | 1–2 h |
 | **G3** | Geometry premise check | Free 4B model, then 27B | **G3** — is the premise even true? | 8–12 h |
 | **1** | Provision GPU, load Gemma3-27B bf16 | 80GB pod | Model loads, generates | 1 h |
 | **1b** | Reproduce the baseline | 80GB pod | **G1 — HARD GATE** (~38% TPR @ 0% FPR) | 0.5–2 days |
@@ -29,7 +29,7 @@ runs until a cheaper gate has cleared it.
 | **3** | Full detection sweep | 80GB pod | Primary data collected | 1–2 days |
 | **4** | Abliteration arm | 80GB pod | Causal test | 0.5–1 day |
 | **4b** | Random-direction ablation control | 80GB pod | **G5** — is the effect refusal-specific? | 0.5 day |
-| **5** | Analysis + charts | Your laptop | Deliverables | 1–2 days |
+| **5** | Analysis + charts | Local machine | Deliverables | 1–2 days |
 
 > **The single most important ordering rule:** run **G3 before you rent anything**, and do not start the
 > full sweep (Stage 3) until **G1 has cleared** and **the decline pilot (2.5) has cleared**. Most projects
@@ -399,7 +399,7 @@ result. Flattens under **both** → non-specific; you've resolved a live disagre
 
 ## Stage 5 — Analysis and deliverables
 
-**Goal:** the charts and tables. Runs on your laptop from the aggregates you pulled off the pod.
+**Goal:** the charts and tables. Runs on a local machine from the aggregates pulled off the pod.
 
 ### 5.1 Statistics
 
@@ -427,7 +427,7 @@ Chart 1 is flat. Write toward whichever the data gives you.
 ## 10. Data hygiene — what never leaves the pod
 
 Collected from [`CLAUDE.md`](../CLAUDE.md) and [`risks-and-ethics.md`](risks-and-ethics.md). Run the
-**pre-push checklist every time** — it's designed for when you're too tired to reason at 2am mid-sweep.
+**pre-push checklist every time** — it's a mechanical check, meant to hold up even when reasoning is unreliable mid-sweep.
 
 **🛑 Never:**
 - Upload **ablated weights** anywhere — HF (public or private), Drive, gist, pastebin. Regenerate, never archive.
@@ -474,11 +474,11 @@ mistake; an undisclosed one is the thing the ethics position exists to prevent.
 
 ## 12. What to expect, in one paragraph
 
-You will spend **more time on Stage 1b (baseline) than you expect** and **less on the sweep than you fear** —
-the sweep is mechanical once the baseline holds. The two things most likely to cost you real time are the
-**baseline not reproducing** (quantisation/template) and the **harmful arm declining to engage** — both are
-front-loaded into cheap gates (G1, and the 2.5 pilot) precisely so you hit them before the metered sweep.
-G3 may hand you a redirect before you spend a cent. Keep the ablated model on one controlled pod, publish
+Expect **Stage 1b (baseline) to be the time sink, and the sweep to be mechanical** once the baseline holds.
+The two things most likely to cost real time are the **baseline not reproducing** (quantisation/template)
+and the **harmful arm declining to engage** — both are front-loaded into cheap gates (G1, and the 2.5 pilot)
+so they surface before the metered sweep. G3 may force a redirect before any compute is provisioned. Keep
+the ablated model on one controlled pod, publish
 **rates not artifacts**, run the pre-push checklist every single time, and every outcome in the
 [outcome table](project-plan.md#8-outcomes--all-publishable) is a paper.
 ```

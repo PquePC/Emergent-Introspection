@@ -7,11 +7,11 @@ where the exact wording matters.
 
 ---
 
-## 1. The concepts you need
+## 1. Key concepts
 
 **Residual stream.** Every token position in a transformer carries a vector (Gemma3-27B: 5376
 dimensions). Layers read from it and **add** their output back — a shared, accumulating "highway."
-Because layers *add* to it, you can inject your own vector by simple addition. That is what makes this
+Because layers *add* to it, a vector can be injected by simple addition. That is what makes this
 whole research area possible.
 
 **Activation steering.** Adding a vector to the residual stream at a chosen layer and token position

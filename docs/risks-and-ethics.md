@@ -99,13 +99,13 @@ that will comply with harmful requests. *That* is the genuinely sensitive artifa
 the word "weapon."
 
 **Handle it as follows:**
-- Run it **only on a rented instance you control**; destroy the pod afterwards
+- Run it **only on a controlled rented instance**; destroy the pod afterwards
 - **Never upload abliterated weights** anywhere — not HuggingFace, not a shared drive, not a repo
 - Use ***Mechanisms of Introspective Awareness* (Anthropic) published minimum effective dose** (smallest weight achieving ≥30% judged refusal bypass)
   rather than optimising a stronger ablation. You need *enough* ablation to test the mechanism, not the
   *most*
-- Note in the write-up that abliteration is already public (Arditi et al., NeurIPS 2024, with code) — you are
-  reproducing a published intervention at published settings, not developing a new one
+- Note in the write-up that abliteration is already public (Arditi et al., NeurIPS 2024, with code) — this
+  reproduces a published intervention at published settings, rather than developing a new one
 
 If any part of this project draws scrutiny, it will be this step. **It is also the step that turns a
 correlation into a causal claim**, so it's worth doing — carefully, and with this paragraph ready.
@@ -142,7 +142,7 @@ Having it imposed reads as a correction.
 
 The core experiment is **the released pipeline accompanying *Mechanisms of Introspective Awareness* (Anthropic) with a different concept list.** They provide the
 injection harness, the concept list, the judge, and the abliteration code. The verified operating point
-(Gemma3-27B, **L37, α=4**, baseline **38.2% TPR @ 0% FPR**) is published, so you have a target to
+(Gemma3-27B, **L37, α=4**, baseline **38.2% TPR @ 0% FPR**) is published, so there is a target to
 reproduce rather than a parameter space to search.
 
 **The engineering surface is small; the scientific content is in the arm design and the controls.**
@@ -182,8 +182,8 @@ for review rather than pressing on with a broken baseline.
 **② Refusal-to-engage masquerades as non-detection.** *(Most dangerous.)*
 Inject "weapon", ask "do you detect an injected thought?", and the model may respond *"I can't help with
 that"* — which is **not** a failure to detect. It is a refusal to engage. If the judge scores that as
-"no detection," you will measure a spectacular blind spot that is pure artifact, and the whole headline
-will be wrong.
+"no detection," the measured result is a spectacular blind spot that is pure artifact, and the whole
+headline will be wrong.
 
 > **Mitigation:** the judge must distinguish three outcomes — *detected* / *did not detect* / *declined to
 > engage*. **Pilot this on ~5 harmful concepts before spending anything on the full sweep.** If refusal
@@ -274,6 +274,6 @@ most likely to break it.**
 | **Is it legitimate?** | Yes. Strictly less capability-uplifting than several NeurIPS-published precedents. The concepts are English words |
 | **Is it risky?** | The concepts are not. **The abliteration step is** — handle per §2.2 |
 | **Is it doable?** | Yes — it builds on a released pipeline at a published operating point |
-| **What do I do first?** | **The G3 premise check (③).** Free-to-cheap, decisive, needs no provisioned compute, and nothing in it is wasted — it is Step 2 pulled forward |
+| **What comes first?** | **The G3 premise check (③).** Free-to-cheap, decisive, needs no provisioned compute, and nothing in it is wasted — it is Step 2 pulled forward |
 | **What kills it?** | The refusal-to-engage confound (②) — **and note the obvious fix makes it worse**; the missing random-direction control (④); and a G3 null (③), which redirects rather than kills. All are cheap to handle **if planned for** |
 | **What if ethics objects?** | §2.4 — the mechanism tests fine with zero harmful concepts |
