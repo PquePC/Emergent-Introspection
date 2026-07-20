@@ -10,12 +10,14 @@
 
 Anthropic showed that language models can sometimes **notice when a concept is injected into their
 activations** — inject a "bread" vector and the model may report an intrusive thought about bread. But
-every study of this has used harmless words. The ethics statement of *Mechanisms of Introspective Awareness* (Macar et al. — **Anthropic**, arXiv:2603.21396) says it plainly: the concept
+every study of this has used harmless words. The ethics statement of *Mechanisms of Introspective
+Awareness* (Macar et al. — **Anthropic Fellows Program** / MIT / Constellation, advised by Lindsey &
+Ameisen of Anthropic, arXiv:2603.21396) says it plainly: the concept
 sets *"are drawn from common English words and **do not contain sensitive or harmful content**."* Fonseca
 Rivera & Africa's 500 concepts span 21 categories — *apple, hammer, umbrella, jumping, truth, courage,
 happiness* — with no harmful category at all.
 
-Meanwhile, the same Anthropic paper found what **suppresses** this noticing: refusal training.
+Meanwhile, the same paper found what **suppresses** this noticing: refusal training.
 
 > *"We hypothesize that refusal behavior, learned during post-training, **suppresses detection by teaching
 > models to deny having thoughts or internal states**."* — ablating the refusal direction raises detection
@@ -38,7 +40,7 @@ The causal chain is assembled from published findings, not speculation:
    *"correlates strongly with its geometric alignment (cosine similarity) to the model's internal refusal
    direction."*
 2. **The refusal direction suppresses introspective detection.**
-   *Mechanisms of Introspective Awareness* (Macar et al. — **Anthropic**, arXiv:2603.21396): abliteration takes detection **10.8% → 63.8%**, while false positives rise
+   *Mechanisms of Introspective Awareness* (Macar et al. — **Anthropic Fellows Program**, arXiv:2603.21396): abliteration takes detection **10.8% → 63.8%**, while false positives rise
    only **0.0% → 7.3%**.
 3. **∴ Detection should fall as a concept vector aligns with refusal.**
 4. **∴ Ablating refusal should flatten that relationship.**
@@ -73,10 +75,10 @@ harmful behaviour are robust to the model noticing and gaming them.
 
 ## 4. Design
 
-**Model:** `google/gemma-3-27b-it` (62 layers, residual dim 5376). Chosen because *Mechanisms of Introspective Awareness* (Anthropic) document
+**Model:** `google/gemma-3-27b-it` (62 layers, residual dim 5376). Chosen because *Mechanisms of Introspective Awareness* (Anthropic Fellows Program) document
 emergent introspection in it with **no detection training**, at a known operating point.
 
-**Verified operating point (from *Mechanisms of Introspective Awareness* (Anthropic)):** inject at **L37** (≈60% depth), **α = 4**, last prompt
+**Verified operating point (from *Mechanisms of Introspective Awareness* (Anthropic Fellows Program)):** inject at **L37** (≈60% depth), **α = 4**, last prompt
 token. Baseline: **38.2% mean detection at 0% FPR** across 500 concepts (median 30.0%, range 0–100%).
 
 > ⚠️ Verify L37/α=4 against the released code before the main sweep — these constants are load-bearing.
@@ -138,7 +140,7 @@ abliteration arm proves nothing about mechanism.
 > before any sweep is run. Default if coupling is adequate-but-not-maximal in Gemma-3: **stay with
 > Gemma3-27B** — the baseline is worth more than a marginally stronger effect.
 
-**Vector construction:** follow *Mechanisms of Introspective Awareness* (Anthropic), who compute concept vectors *"following Lindsey (2025)"* —
+**Vector construction:** follow *Mechanisms of Introspective Awareness* (Anthropic Fellows Program), who compute concept vectors *"following Lindsey (2025)"* —
 **not CAA**. Match their construction so the 38.2% baseline is directly comparable.
 
 **Tooling — reuse, do not rebuild:** [`safety-research/introspection-mechanisms`](https://github.com/safety-research/introspection-mechanisms)
@@ -192,7 +194,7 @@ These turn four discrete arms into a continuous axis, and they are what make Cha
 Without arms 2 and 3 the result is uninterpretable. **Do not skip them.**
 
 Every arm is **magnitude-matched** to the benign arm's mean `‖v‖` — otherwise a detection difference could
-be a magnitude effect. (*Mechanisms of Introspective Awareness* (Anthropic) Appendix H finds *"Concept vector norm is not a predictor"*, so this
+be a magnitude effect. (*Mechanisms of Introspective Awareness* (Anthropic Fellows Program) Appendix H finds *"Concept vector norm is not a predictor"*, so this
 should be a formality — but it is verified in-data rather than assumed.)
 
 ---
@@ -246,7 +248,7 @@ result"* is a genuine finding, obtained cheaply, and it reshapes the question ra
 Given HARC's depth-decoupling result, a null is now genuinely plausible rather than a formality.
 
 ### Step 2 — Build the four concept arms
-~40 concepts per arm, single-token where possible (*Mechanisms of Introspective Awareness* (Anthropic) notes verbalizability effects). Construct vectors
+~40 concepts per arm, single-token where possible (*Mechanisms of Introspective Awareness* (Anthropic Fellows Program) notes verbalizability effects). Construct vectors
 using their extraction code. Then compute, for every concept:
 - `‖v‖` (for magnitude-matching)
 - **`cos(v_concept, d_refusal)`** — the refusal direction, extracted per *Refusal … Single Direction* (Arditi et al., NeurIPS 2024) (per-layer
@@ -321,7 +323,7 @@ Plus the **clean, no-injection condition** for FPR. Checkpoint continuously.
 
 ### Step 4 — The abliteration arm (the causal test)
 Repeat Step 3 on the refusal-ablated model using `03d_refusal_abliteration.py`. Use their minimum
-effective dose (smallest weight achieving ≥30% judged refusal bypass) and **α = 2**, since *Mechanisms of Introspective Awareness* (Anthropic) notes the
+effective dose (smallest weight achieving ≥30% judged refusal bypass) and **α = 2**, since *Mechanisms of Introspective Awareness* (Anthropic Fellows Program) notes the
 abliterated model shows coherence degradation at higher strengths.
 
 **This step is what elevates the project from a correlation to a causal claim.** If refusal is the
@@ -330,7 +332,7 @@ suppressor, abliteration should close the harmful/benign gap *specifically*.
 > ### ⚠️ Step 4 requires a random-direction ablation control. Non-negotiable.
 >
 > The two papers that ran this control **disagree**:
-> - ***Mechanisms of Introspective Awareness* (Anthropic)** (Anthropic): the effect is *"exclusive to the refusal direction: a magnitude-matched
+> - ***Mechanisms of Introspective Awareness* (Anthropic Fellows Program)**: the effect is *"exclusive to the refusal direction: a magnitude-matched
 >   random direction control yields TPR−FPR at or below baseline at most configurations."*
 > - **KAIST** (*Adversarial Prefills*): *"a random direction closes much of the gap as well, so the refusal
 >   direction is **sufficient to account for the signal without being its only mediator**."*
@@ -356,7 +358,7 @@ statistics — sample sizes are limited and effect sizes should be reported with
 **Chart 2 — the mechanism.** Detection rate vs **`cos(v_concept, d_refusal)`**, every concept a point.
 > A continuous version of Chart 1. If the mechanism is real, this slope is **negative**: the more a
 > concept aligns with refusal, the less the model notices it. This is the plot that connects TUM's
-> geometry to Anthropic's mechanism, and it is the strongest single artifact the project can produce.
+> geometry to Macar et al.'s mechanism, and it is the strongest single artifact the project can produce.
 
 **Chart 3 — the causal test.** Chart 2, before vs after abliteration.
 > If refusal is the suppressor, **the slope should flatten.**
@@ -371,7 +373,7 @@ statistics — sample sizes are limited and effect sizes should be reported with
 |---|---|
 | Harmful **<** benign, arms 2–3 flat, negative slope in Chart 2, flattens under abliteration | **"Models are blindest to the manipulations that matter most"** — and the mechanism is proven, not just observed |
 | Harmful **<** benign, but arm 2 or 3 also drops | The effect is valence or topic, not harm. Still novel, still worth reporting — and it corrects a natural misreading |
-| Harmful **≈** benign | **Refusal does not suppress detection for harmful content** → bounds Anthropic's stated mechanism, **and independently confirms Lederman & Mahowald's content-agnosticism claim on the one content dimension most likely to break it** |
+| Harmful **≈** benign | **Refusal does not suppress detection for harmful content** → bounds Macar et al.'s stated mechanism, **and independently confirms Lederman & Mahowald's content-agnosticism claim on the one content dimension most likely to break it** |
 | Harmful **>** benign | Refusal machinery *helps* detection → surprising, and directly against the predicted direction |
 | Slope flattens under **both** refusal and random ablation | Ablation is non-specific → consistent with KAIST, inconsistent with *Mechanisms*. Resolves a live disagreement between two published papers |
 | Carrier-level signal present, verbal report suppressed | **The model registers the injection but does not report it** — a dissociation between internal state and self-report, on the safety-critical case. Obtainable even if every arm looks flat |
@@ -438,7 +440,7 @@ direction for a word confers no uplift — this is categorically unlike jailbrea
 The framing is **defensive**: the question is whether a model's self-monitoring covers the safety-critical
 case, and a blind spot is an audit finding.
 
-*Mechanisms of Introspective Awareness* (Anthropic) exclude harmful concepts and flag dual-use risk for *elicitation methods* (abliteration,
+*Mechanisms of Introspective Awareness* (Anthropic Fellows Program) exclude harmful concepts and flag dual-use risk for *elicitation methods* (abliteration,
 trained bias vectors). This project re-runs their **already-released** abliteration at their published
 settings rather than developing a stronger one. Refusal-direction ablation is itself published openly
 (*Refusal … Single Direction* — Arditi et al., NeurIPS 2024).

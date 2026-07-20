@@ -16,14 +16,14 @@ before ever saying the word. This is one of the most striking results in interpr
 reporting, accurately, on its own internal state.
 
 **Every study of this has used harmless words.** The ethics statement of *Mechanisms of Introspective
-Awareness* (Macar, Yang, Wang, Wallich, Ameisen & Lindsey — Anthropic Fellows Program / MIT /
-Constellation / **Anthropic**, arXiv:2603.21396) says it outright: the concept sets *"are drawn from common
+Awareness* (Macar, Yang, Wang, Wallich, Ameisen & Lindsey — **Anthropic Fellows Program** / MIT /
+Constellation, advised by Lindsey & Ameisen of Anthropic, arXiv:2603.21396) says it outright: the concept sets *"are drawn from common
 English words and **do not contain sensitive or harmful content**."* The 500 concepts in *Steering
 Awareness: Detecting Activation Steering from Within* (Fonseca Rivera & Africa — **UT Austin**,
 arXiv:2511.21399) span 21 categories — *apple, hammer, umbrella, jumping, truth, courage, happiness* —
 without a single harmful one.
 
-The same Anthropic paper identified what **suppresses** this noticing:
+The same paper identified what **suppresses** this noticing:
 
 > *"We hypothesize that refusal behavior, learned during post-training, **suppresses detection by teaching
 > models to deny having thoughts or internal states**."*
@@ -75,7 +75,7 @@ The causal chain is assembled from published findings across three independent g
 | # | Claim | Source |
 |---|---|---|
 | 1 | Steering vectors **partially align with the refusal direction**, and that overlap causally drives their safety impact | *Analysing the Safety Pitfalls of Steering Vectors* — Li, Fastowski, Zaradoukas, Prenkaj & Kasneci (**TU Munich / MCML**), arXiv:2603.24543 |
-| 2 | The refusal direction **suppresses introspective detection** — abliteration takes detection 10.8% → 63.8%, FPR only 0.0% → 7.3% | *Mechanisms of Introspective Awareness* — Macar et al. (**Anthropic**), arXiv:2603.21396 |
+| 2 | The refusal direction **suppresses introspective detection** — abliteration takes detection 10.8% → 63.8%, FPR only 0.0% → 7.3% | *Mechanisms of Introspective Awareness* — Macar et al. (**Anthropic Fellows Program**), arXiv:2603.21396 |
 | 3 | ∴ Detection should **fall** as a concept vector aligns with refusal | *this project* |
 | 4 | ∴ Ablating refusal should **flatten** that relationship | *this project* |
 
@@ -111,7 +111,7 @@ without testing it directly:
   Gondil, arXiv:2604.00228. Across 10 sensitive topics and 5 harm levels: *"weapons-related queries are
   consistently hardest for introspection."* Measures behavioural self-prediction rather than injection
   detection.
-- *Mechanisms of Introspective Awareness* (Anthropic) **excludes harmful concepts by policy** — leaving the
+- *Mechanisms of Introspective Awareness* (Anthropic Fellows Program) **excludes harmful concepts by policy** — leaving the
   case untested in the paradigm where the mechanism was characterised.
 
 ---
@@ -144,7 +144,7 @@ demonstrated cause from an observed correlation.
 
 The project builds directly on released infrastructure —
 [`safety-research/introspection-mechanisms`](https://github.com/safety-research/introspection-mechanisms),
-the code accompanying *Mechanisms of Introspective Awareness* (Anthropic):
+the code accompanying *Mechanisms of Introspective Awareness* (Anthropic Fellows Program):
 
 | Component | Provided |
 |---|---|
