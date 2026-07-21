@@ -188,6 +188,11 @@ Miller, E. (2024). *Adding Error Bars to Evals: A Statistical Approach to Langua
 Anthropic
 > **Use this for the statistics.** n is small and the effect may be modest.
 
+Warriner, A. B., Kuperman, V. & Brysbaert, M. (2013). *Norms of Valence, Arousal, and Dominance for
+13,915 English Lemmas.* Behavior Research Methods 45(4).
+> The affective-norms dataset. Lederman & Mahowald apply it to the *confabulations* (guesses skew concrete,
+> positive, low-arousal); this project applies valence as an **arm**, not a post-hoc norm.
+
 ---
 
 ## Context

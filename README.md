@@ -17,13 +17,13 @@ reporting, accurately, on its own internal state.
 
 **Every study of this has used harmless words.** The ethics statement of *Mechanisms of Introspective
 Awareness* (Macar, Yang, Wang, Wallich, Ameisen & Lindsey — **Anthropic Fellows Program** / MIT /
-Constellation, advised by Lindsey & Ameisen of Anthropic, arXiv:2603.21396) says it outright: the concept sets *"are drawn from common
+Constellation, arXiv:2603.21396) says it outright: the concept sets *"are drawn from common
 English words and **do not contain sensitive or harmful content**."* The 500 concepts in *Steering
 Awareness: Detecting Activation Steering from Within* (Fonseca Rivera & Africa — **UT Austin**,
 arXiv:2511.21399) span 21 categories — *apple, hammer, umbrella, jumping, truth, courage, happiness* —
 without a single harmful one.
 
-The same paper identified what **suppresses** this noticing:
+*Mechanisms of Introspective Awareness* identified what **suppresses** this noticing:
 
 > *"We hypothesize that refusal behavior, learned during post-training, **suppresses detection by teaching
 > models to deny having thoughts or internal states**."*

@@ -40,7 +40,7 @@ released code:
 |---|---|---|
 | ***Refusal in Language Models Is Mediated by a Single Direction* (Arditi et al. — **NeurIPS 2024**)** | A method to **remove refusal from any open-weight model**, with code | **NeurIPS** |
 | **Zou et al., *Representation Engineering*** | Harmful/power-seeking/deception directions; **AdvBench** | CAIS / CMU / Berkeley / Stanford |
-| ***Mechanisms of Introspective Awareness* (Macar et al. — **Anthropic**, arXiv:2603.21396)** | Refusal abliteration on Gemma3-27B, with released code and configs | **Anthropic** |
+| ***Mechanisms of Introspective Awareness* (Macar et al. — **Anthropic Fellows Program**, arXiv:2603.21396)** | Refusal abliteration on Gemma3-27B, with released code and configs | **Anthropic Fellows Program** |
 | ***Analysing the Safety Pitfalls of Steering Vectors* (Li et al. — **TU Munich / MCML**, arXiv:2603.24543)** | Steering that swings jailbreak success **+57% / −50%** | TUM / MCML |
 | ***Steering Awareness* (Fonseca Rivera & Africa, UT Austin)** | Compliance vectors injected into **AdvBench harmful requests** | UT Austin |
 | ***Can LLMs Reliably Self-Report Adversarial Prefills, and How?* (Nguyen, Ahmed & Kim — **KAIST**, arXiv:2606.23671)** | Adversarial prefill attacks + refusal orthogonalisation across 10 models | KAIST |
@@ -180,7 +180,7 @@ Feasibility inventory; full mitigations are the gates in [`methodology.md`](meth
 | # | Failure mode | Why it bites | Guard |
 |---|---|---|---|
 | ① | **Baseline doesn't reproduce** *(most likely)* | quantisation, prompt template, or wrong layer — and without ~38% TPR@0%FPR every downstream number is meaningless | Hard gate **G1**: run bf16 on 80GB, try L37 then L38, escalate rather than press on |
-| ② | **Refusal-to-engage masquerades as non-detection** *(most dangerous)* | *"I can't help with that"* scored as "no detection" fabricates a blind spot | Three-way judge label; pilot ~5 harmful concepts; ≥2 framings (KAIST: framing changes recognition). **Do not filter declines** — declining is the refusal mechanism acting on the report, so it is a realisation of the DV, and filtering breaks the Step 3/4 comparison (methodology Step 3) |
+| ② | **Refusal-to-engage masquerades as non-detection** *(most dangerous)* | *"I can't help with that"* scored as "no detection" fabricates a blind spot | **G2** decline pilot: three-way judge label; pilot ~5 harmful concepts; ≥2 framings (KAIST: framing changes recognition). **Do not filter declines** — declining is the refusal mechanism acting on the report, so it is a realisation of the DV, and filtering breaks the Step 3/4 comparison (methodology Step 3) |
 | ③ | **The premise fails** *(cheapest — check first)* | harm and refusal decouple with depth (HARC), and L37 is late, so concept vectors may not be refusal-aligned there | **G3** premise check first, on a free 4B model; sweep protocol × layer + report subspace projection. A null redirects the project, not kills it |
 | ④ | **Ablation isn't refusal-specific** | Macar ("exclusive to the refusal direction") and KAIST ("a random direction closes much of the gap") disagree | Mandatory random-direction control (**G5**); if random flattens the slope too, the causal claim collapses |
 

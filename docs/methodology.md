@@ -15,8 +15,8 @@
 Anthropic showed that language models can sometimes **notice when a concept is injected into their
 activations** — inject a "bread" vector and the model may report an intrusive thought about bread. But
 every study of this has used harmless words. The ethics statement of *Mechanisms of Introspective
-Awareness* (Macar et al. — **Anthropic Fellows Program** / MIT / Constellation, advised by Lindsey &
-Ameisen of Anthropic, arXiv:2603.21396) says it plainly: the concept
+Awareness* (Macar et al. — **Anthropic Fellows Program** / MIT / Constellation, arXiv:2603.21396) says it
+plainly: the concept
 sets *"are drawn from common English words and **do not contain sensitive or harmful content**."* Fonseca
 Rivera & Africa's 500 concepts span 21 categories — *apple, hammer, umbrella, jumping, truth, courage,
 happiness* — with no harmful category at all.
@@ -96,7 +96,8 @@ certainty.
 **Why not larger.** A 70B+ open-weight model forfeits the baseline gate, requires multi-GPU sharding, and
 roughly triples cost for no additional scientific claim — the hypothesis is about a mechanism, not about
 scale. Frontier models cannot be steered at all: activation injection requires open weights. That
-constraint is the origin of the model-organism framing (§Scope), not a compromise within it.
+constraint is the origin of the model-organism framing (see [`../README.md`](../README.md) *Related work
+and scope*), not a compromise within it.
 
 ### 4.2 Model families — cross-family where it is cheap, single-model where it is expensive
 
@@ -151,7 +152,8 @@ note is below.
 > Standard guidance for `gemma-3-27b-it` at bf16 is **1×A100 80GB or 1×H100**. Since **quantisation is a
 > prime suspect for baseline-reproduction failure (G1)**, running at bf16 on 80GB removes the most likely
 > cause of the project's most likely failure. Use a 24GB card only for smoke tests and for G3 pilot work on
-> a smaller Gemma-3 variant (Step 2-pre).
+> a small model — the registry's smallest is `gemma2_2b`; use 4B-class Qwen/Llama for the cross-family
+> G3 (Step 2-pre).
 
 ---
 
@@ -339,7 +341,7 @@ abliterated model shows coherence degradation at higher strengths.
 **This step is what elevates the project from a correlation to a causal claim.** If refusal is the
 suppressor, abliteration should close the harmful/benign gap *specifically*.
 
-> ### ⚠️ Step 4 requires a random-direction ablation control. Non-negotiable.
+> ### ⚠️ Step 4b — the random-direction ablation control (non-negotiable)
 >
 > The two papers that ran this control **disagree**:
 > - ***Mechanisms of Introspective Awareness* (Anthropic Fellows Program)**: the effect is *"exclusive to the refusal direction: a magnitude-matched
@@ -422,7 +424,7 @@ injected concept. The question this project asks is open.
    logit shift cannot produce that. This plus (4) is the standing bias defense.
 3. **Forced-choice localisation and nonsense controls are deferred confirmatory probes**, not primary
    instruments — pulled back only if a harmful-vs-benign gap appears (Step 3), and then over the affected
-   concepts only. (Per Hahami et al. and Godet's replication critique; net-new code, see the private note.)
+   concepts only. (Per Hahami et al.; net-new code, see the private note.)
 4. **Magnitude-match every arm** — this, not the forced-choice probe, is what neutralises cross-arm response
    bias up front (generic "steering present" bias hits all arms equally at matched norm).
 5. **Self-report is the ground truth**; probes are instruments.

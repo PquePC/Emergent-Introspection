@@ -3,7 +3,7 @@
 ## What this project is
 
 Research on whether language models detect activation-level concept injection differently when the
-injected concept is **harmful**. See `README.md` for the science and `docs/project-plan.md` for the
+injected concept is **harmful**. See `README.md` for the science and `docs/methodology.md` for the
 method. The measured output is a detection **rate** — rates are safe to publish.
 
 ## Sensitive artifacts
@@ -46,7 +46,7 @@ auditing one**, raise it rather than doing it.
 | Question | File |
 |---|---|
 | What is the project, why it matters | `README.md` |
-| Method, decision gates, deliverables | `docs/project-plan.md` |
+| Method, decision gates, deliverables | `docs/methodology.md` |
 | Ethics position, risk register, fallback design | `docs/risks-and-ethics.md` |
 | Literature, what is contested | `docs/background.md` |
 | References | `BIBLIOGRAPHY.md` |
