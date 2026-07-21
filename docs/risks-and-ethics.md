@@ -6,7 +6,7 @@ This document exists because the project does something a Tier-1 lab explicitly 
 **harmful concepts** into a model and measure whether it notices. That choice deserves a direct answer, not
 a footnote.
 
-> Main plan: [`project-plan.md`](project-plan.md)
+> Methodology: [`methodology.md`](methodology.md) · Runbook: [`execution-guide.md`](execution-guide.md)
 
 ---
 
@@ -218,7 +218,7 @@ The whole hypothesis assumes `cos(v_harmful, d_refusal) > cos(v_benign, d_refusa
 **behavioural** steering vectors (sycophancy, corrigibility) — **not for concept vectors**. Whether a
 "weapon" *concept* vector aligns with refusal is genuinely untested.
 
-> **Mitigation: run the premise check (G3) before any sweep** — `project-plan.md` Step 2-pre. It is
+> **Mitigation: run the premise check (G3) before any sweep** — `methodology.md` Step 2-pre. It is
 > inference-only: no judge, no abliteration, no sweep. A few hundred forward passes and some linear algebra.
 > **Runnable on a free 4B-class model before any compute is provisioned**, then confirmed on 27B for a few
 > dollars.

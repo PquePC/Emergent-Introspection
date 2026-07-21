@@ -20,8 +20,8 @@ Every study of this used harmless words. But the same Anthropic paper found that
 suppresses this noticing** — turn off refusal and detection jumps from ~11% to ~64%. And harmful
 concepts are exactly the ones that trigger refusal.
 
-So the prediction nobody has tested: **models should be worst at noticing the injected thoughts that
-are harmful** — a blind spot precisely where it would most matter for them to speak up.
+So the untested prediction: **models should be worst at noticing the injected thoughts that are
+harmful** — a blind spot precisely where it would most matter for them to speak up.
 
 ---
 
@@ -123,7 +123,7 @@ There's no version of this that produces nothing.
 - **Lindsey 2025, "Emergent Introspective Awareness" (Anthropic)** — first showed models can notice
   injected concepts.
 - **Macar et al. 2026, "Mechanisms of Introspective Awareness" (Anthropic, arXiv:2603.21396)** — the
-  the paper this project extends. Gives the method, the test model, the 38% baseline, *and* the key
+  paper this project extends. Gives the method, the test model, the 38% baseline, *and* the key
   finding that refusal training suppresses detection. It explicitly excluded harmful concepts — that
   exclusion is the gap this project fills.
 

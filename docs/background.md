@@ -3,7 +3,7 @@
 What this project rests on. Only the parts relevant to the safety-shaped blind spot — quoted verbatim
 where the exact wording matters.
 
-> Main plan: [`project-plan.md`](project-plan.md) · References: [`../BIBLIOGRAPHY.md`](../BIBLIOGRAPHY.md)
+> Methodology: [`methodology.md`](methodology.md) · Runbook: [`execution-guide.md`](execution-guide.md) · References: [`../BIBLIOGRAPHY.md`](../BIBLIOGRAPHY.md)
 
 ---
 
@@ -100,13 +100,13 @@ detection should **fall** with refusal alignment, and abliteration should **flat
 
 **Status of each link.** 3.1 is published and replicated. 3.2-as-extended-to-concept-vectors is **a premise,
 not a result**, and the table above shows it is *contestable* rather than merely unverified. The plan
-therefore opens with the premise check (`project-plan.md` Step 2-pre) before any sweep.
+therefore opens with the premise check (`methodology.md` Step 2-pre) before any sweep.
 
 ---
 
 ## 4. The gap
 
-**Nobody has injected a harmful concept and measured detection.**
+**No published work injects a harmful concept and measures detection.**
 
 | Paper | Concepts used | Harmful? |
 |---|---|---|
@@ -140,11 +140,11 @@ Chart 1 should be flat.
   concreteness have no such mechanism. Harmfulness has refusal. That asymmetry is the project's entire
   motivation, and it is also why arms 2 and 3 are the right controls rather than merely diligent ones.
 - **It makes every outcome answer a stated thesis.** Flat *confirms* a named published claim on its hardest
-  case; a drop *refutes* it. The null becomes publishable — which is exactly what a solo project needs.
+  case; a drop *refutes* it — so the null is a result, not a dead end.
 
 ---
 
-## 5. Adjacent work — three papers point here, none runs it
+## 5. Adjacent work
 
 ***Can LLMs Reliably Self-Report Adversarial Prefills, and How?* (Nguyen, Ahmed & Kim — **KAIST**, arXiv:2606.23671)** — *the closest work; cite prominently.*
 Ten open-weight models (3B–70B). *"No model reliably recognizes its compromised outputs"* — **27.3%** claim
@@ -172,8 +172,8 @@ levels** (L1 clearly safe educational → L5 clearly harmful/AdvBench). Finds d�
 their **graded harm taxonomy**, and their use of **empirical refusal rates as ground truth rather than
 assigned harm labels**.
 
-**Analysing the Safety Pitfalls of Steering Vectors — *Analysing the Safety Pitfalls of Steering Vectors* (TU Munich)** — see §3.2. No introspection at all, but it
-supplies the geometric link.
+***Analysing the Safety Pitfalls of Steering Vectors* (TU Munich)** — see §3.2. No introspection at all,
+but it supplies the geometric link.
 
 ---
 
@@ -237,7 +237,7 @@ harm labels (§5, Gondil) — and a further reason to run the premise check firs
 | Question | Status |
 |---|---|
 | Do models detect **harmful** concept injection? | **Open** — excluded by policy in the Tier-1 paper |
-| Does detection fall with **refusal alignment** of the concept vector? | **Open** — nobody has plotted it |
+| Does detection fall with **refusal alignment** of the concept vector? | **Open** — unmeasured |
 | Do **harmful concept** vectors even align with refusal? | **Open, and newly contestable** — TU Munich showed it for behavioural vectors only; **HARC** now shows harm/refusal decouple with depth, and the injection layer is late |
 | Is introspection **content-agnostic**, on the one content dimension with a mechanism? | **Open** — Lederman & Mahowald claim yes (§4.1); this project tests it where refusal predicts no |
 | Does abliteration **close the gap**, and is the effect **refusal-specific**? | **Open, and contested** — *Mechanisms of Introspective Awareness* (Anthropic) and *Can LLMs Reliably Self-Report Adversarial Prefills?* (KAIST) disagree on the random-direction control |
@@ -262,8 +262,8 @@ Two independent results support the shape of this:
   logit-lens analysis reveals clear detection signal in the residual stream**. Exactly the
   registers-but-denies dissociation, already demonstrated. (Also the source of the prompt-based elicitation
   lever: detection **0.3% → 39.9%** when the prompt explains introspection.)
-- *Detecting the Disturbance* / *Feeling the Strength but Not the Source* (arXiv:2512.12411) — models can
-  detect *that* and *how strongly* without the *what*.
+- *Detecting the Disturbance* (Hahami et al., arXiv:2512.12411) — models can detect *that* and *how
+  strongly* without the *what*.
 
 **Measurement consequence:** a logit-lens or linear-probe readout at the carrier layers **rides on the same
 forward passes as the main sweep** — a strict add-on, not a redesign. If the harmful arm shows carrier-level

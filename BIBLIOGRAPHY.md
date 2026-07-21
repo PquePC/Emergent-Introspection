@@ -154,8 +154,10 @@ Binder, F., Chua, J., Korbak, T., Sleight, H., Hughes, J., Long, R., Perez, E., 
 Hahami, E., Sinha, I., Jain, L., Kaplan, J. & Hahami, J. (2026). *Detecting the Disturbance: A Nuanced View
 of Introspective Abilities in LLMs.* arXiv:2512.12411 · Harvard College / U Chicago
 > The methodological critique. Argues binary detection is *"entirely explained by global logit shifts."*
-> Single model (Llama-3.1-8B). **Partially rebutted by Macar's 0% FPR** — but its prescription
-> (forced-choice over binary; report FPR; use nonsense controls) is adopted here regardless.
+> Single model (Llama-3.1-8B). **Rebutted by Macar's 0% FPR** — a pure logit shift cannot produce detection
+> at a genuine 0% FPR, so the FPR calibration *is* the rebuttal. Its fuller prescription (forced-choice
+> localisation; nonsense controls) is held here as a **deferred confirmatory probe**, not a primary
+> instrument — pulled back only if a harmful-vs-benign gap appears (methodology §9).
 
 Fornasiere, D., Bronzi, M., Kitts, S., Palmas, A., Bengio, Y. & Richardson, O. (2026). *Language Models
 Recognize Dropout and Gaussian Noise Applied to Their Activations.* arXiv:2604.17465 · **LawZero**
@@ -213,7 +215,7 @@ Decomposition.* arXiv:2606.06735 · Huawei Noah's Ark Lab / QMUL
 
 ## Tooling
 
-- **`safety-research/introspection-mechanisms`** — https://github.com/safety-research/introspection-mechanisms — **[CORE]** injection harness (`01_concept_injection.py`), steering utils, 500-concept list, LLM judge, refusal abliteration (`03d`/`03e`). Requires Python 3.10+, CUDA 12.x, and the repo states **≥48GB VRAM** — but see below.
+- **`safety-research/introspection-mechanisms`** — https://github.com/safety-research/introspection-mechanisms — **[CORE]** baseline sweep entrypoint (`02b_run_500_concepts.py`, wrapping `02_steering_evaluation.py`; single-run harness `01_concept_injection.py`), steering utils, the 450-concept `experiments/concepts_list.py` (+50 baseline in `02b`), LLM judge, refusal abliteration (`03d`/`03e`). Requires Python 3.10+, CUDA 12.x, and the repo states **≥48GB VRAM** — but see below.
   > ⚠️ **The ≥48GB figure is a floor that assumes quantisation.** Gemma3-27B at bf16 is **~54GB of weights
   > alone**, before KV cache; a 48GB card cannot hold it. Standard guidance for `gemma-3-27b-it` at bf16 is
   > **1×A100 80GB or 1×H100**. Since quantisation is a prime suspect for baseline-reproduction failure (G1),

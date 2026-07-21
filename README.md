@@ -81,38 +81,17 @@ The causal chain is assembled from published findings across three independent g
 
 > ### ⚠️ Link 1 is a premise, not a result — and the project treats it as such
 >
-> TU Munich demonstrated refusal alignment for **behavioural** steering vectors (sycophancy,
-> corrigibility). Whether **concept** vectors — *"weapon"* — align with the refusal direction **has never
-> been measured.** The project's first action is therefore not the experiment but the premise check
-> (G3, [`docs/project-plan.md`](docs/project-plan.md) Step 2-pre): inference-only, cheap, and decisive.
->
-> Two recent results make a null genuinely plausible rather than a formality:
-> - **HARC** (arXiv:2607.00572): `v_harm` and `v_ref` are **distinct** directions whose alignment *"peaks
->   around L12 and then drops through the late layers"* toward orthogonality. This project injects at
->   **L37/62 (~60% depth)** — late.
-> - **Llorente-Saguer** (arXiv:2604.18901): two pooling choices at the *same layer of the same model*
->   recover harm directions **73° apart** — so a single cosine measures a methodological choice as much as
->   the model.
->
-> Accordingly G3 sweeps **protocol × layer × family**, and reports projection onto the refusal *subspace*
-> as well as the scalar cosine (refusal may be a concept cone rather than a single direction —
-> arXiv:2502.17420). **A null redirects the project rather than ending it:** *"harmful concept vectors are
-> not refusal-aligned at the injection layer"* is itself a finding, and a cheap one.
+> TU Munich showed refusal alignment for **behavioural** steering vectors; whether **concept** vectors
+> (*"weapon"*) align with refusal at the injection layer **has never been measured** — and recent geometry
+> results (HARC; Llorente-Saguer) make a null plausible, since harm and refusal decouple with depth and
+> L37/62 is late. So the project's first action is the cheap, inference-only premise check (G3,
+> [`docs/methodology.md`](docs/methodology.md) Step 2-pre); a null redirects the project rather than ending
+> it. Full evidence and the extraction-protocol / concept-cone caveats: [`docs/background.md`](docs/background.md) §3, §6.
 
-**Convergent evidence from adjacent paradigms.** Three independent results point toward this hypothesis
-without testing it directly:
-
-- *Can LLMs Reliably Self-Report Adversarial Prefills, and How?* — Nguyen, Ahmed & Kim (**KAIST**),
-  arXiv:2606.23671. Across ten open-weight models: no model reliably recognises its own compromised
-  outputs (**27.3%**), and *"ablating the refusal direction collapses the recognition gap to near zero on
-  every ablated model."* Establishes the refusal-suppression mechanism for **text prefills**; this project
-  tests the **activation-injection** paradigm.
-- *Do Language Models Know When They'll Refuse? Probing Introspective Awareness of Safety Boundaries* —
-  Gondil, arXiv:2604.00228. Across 10 sensitive topics and 5 harm levels: *"weapons-related queries are
-  consistently hardest for introspection."* Measures behavioural self-prediction rather than injection
-  detection.
-- *Mechanisms of Introspective Awareness* (Anthropic Fellows Program) **excludes harmful concepts by policy** — leaving the
-  case untested in the paradigm where the mechanism was characterised.
+**Convergent evidence.** KAIST (arXiv:2606.23671) establish the same refusal-suppression mechanism for
+**text prefills** — 27.3% self-recognition, collapsing under refusal ablation; Gondil (arXiv:2604.00228)
+finds weapons queries hardest for introspective self-prediction. Neither injects concepts — the gap this
+project fills. Details: [`docs/background.md`](docs/background.md) §5.
 
 ---
 
@@ -148,9 +127,9 @@ the code accompanying *Mechanisms of Introspective Awareness* (Anthropic Fellows
 
 | Component | Provided |
 |---|---|
-| Concept injection harness | `experiments/01_concept_injection.py` |
-| Steering vector extraction | `src/steering_utils.py` |
-| Benign concept list (baseline arm) | `src/concepts_list.py` |
+| Baseline sweep entrypoint (500 concepts) | `experiments/02b_run_500_concepts.py` |
+| Steering-vector extraction | `src/steering_utils.py` |
+| Benign concept list (baseline arm) | `experiments/concepts_list.py` |
 | LLM-judge evaluation | `src/eval_utils.py` |
 | Refusal-direction abliteration | `experiments/03d_refusal_abliteration.py` |
 
@@ -164,9 +143,10 @@ search, and results are directly comparable to the published numbers.
 
 | File | Contents |
 |---|---|
-| [`docs/project-plan.md`](docs/project-plan.md) | **The main plan** — step-by-step method, decision gates, deliverables, outcome analysis |
-| [`docs/risks-and-ethics.md`](docs/risks-and-ethics.md) | **Legitimacy, risk, and feasibility** — research-ethics position, risk register, failure modes, fallback design |
+| [`docs/methodology.md`](docs/methodology.md) | **The methodology** — experimental design, four arms, operating point, primary measure, decision gates, deliverables, outcome analysis |
+| [`docs/execution-guide.md`](docs/execution-guide.md) | **The step-by-step runbook** — stage-by-stage how to run it on RunPod: setup, baseline, sweep sizes, abliteration, debugging, data hygiene |
 | [`docs/background.md`](docs/background.md) | The literature: what is established, what is contested, what is untested |
+| [`docs/risks-and-ethics.md`](docs/risks-and-ethics.md) | **Legitimacy, risk, and feasibility** — research-ethics position, risk register, failure modes, fallback design |
 | [`BIBLIOGRAPHY.md`](BIBLIOGRAPHY.md) | Full references |
 
 ---
@@ -199,7 +179,7 @@ config, or bug, with no way to distinguish them.
 - **Geometry is different.** The G3 premise check runs on **4B-class models across 3–4 families**, because
   harm directions are recoverable from models as small as 0.5B (Llorente-Saguer, arXiv:2604.18901).
   Representational geometry is present at tiny scale; introspective *reporting* is not. Cross-family where
-  it is cheap, single-model where it is expensive. See [`docs/project-plan.md`](docs/project-plan.md) §4.1–4.2.
+  it is cheap, single-model where it is expensive. See [`docs/methodology.md`](docs/methodology.md) §4.1–4.2.
 
 **Method scope.** The experiment injects the *word-concept* "weapon" and asks the model whether it noticed a
 thought; it does not attempt to elicit harmful content and confers no capability uplift. See

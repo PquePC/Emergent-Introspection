@@ -2,7 +2,7 @@
 
 ### *A step-by-step runbook. What to set up, what to run, what to expect, and what to do when it breaks.*
 
-> This is the **operational companion** to [`project-plan.md`](project-plan.md). The plan says *what* the
+> This is the **operational companion** to [`methodology.md`](methodology.md). The plan says *what* the
 > experiment is and *why* each control exists; this file says *how to actually run it*, in order, on a
 > local machine and a rented GPU. Read the plan first — this guide assumes familiarity with the four-arm
 > design, the gates (G1–G4), and the operating point (L37, α=4).
@@ -53,7 +53,7 @@ These have lead times (licence approval, billing verification). Do them on day o
 - [ ] **HF access token** (read scope): `huggingface-cli login` or `HF_TOKEN` env var.
 - [ ] **Judge API key.** The repo defaults to an OpenAI judge (GPT-4o family). Get an `OPENAI_API_KEY`.
       Plan to run the sweep on a **cheap judge** (e.g. `gpt-4o-mini`) with a **GPT-4o agreement subsample**
-      for validation — see [§4 of the plan](project-plan.md) and Stage 5 below.
+      for validation — see [§4 of the plan](methodology.md) and Stage 5 below.
 - [ ] **A GPU-rental account** (RunPod / Lambda / Vast). Do **not** provision yet.
 
 ### 0.2 Clone and install
@@ -71,13 +71,13 @@ pip install -r requirements.txt                        # or: pip install -e .
 
 ### 0.3 Read the code that matters *before* running it
 
-Open these and confirm the constants against the plan — **these are load-bearing** ([plan §4](project-plan.md)):
+Open these and confirm the constants against the plan — **these are load-bearing** ([plan §4](methodology.md)):
 
 | File | What to confirm |
 |---|---|
 | `experiments/01_concept_injection.py` | Single-run harness. The knobs are **`--layer-fraction`** (a *fraction*, not an absolute index) and **`--strength`** (this is α). Repo defaults are **`llama_8b`, `--layer-fraction 0.7`, `--strength 8.0`** — **not** the operating point. Layer = `int(n_layers × fraction)`, so for 62-layer Gemma3, **L37 ≈ fraction 0.6** (0.7 gives L43). Pass model/layer/α explicitly; don't rely on defaults. |
 | `experiments/02b_run_500_concepts.py` | **The actual baseline entrypoint** (wraps `02_steering_evaluation.py`). Its defaults already match the operating point — **`--model gemma3_27b`, `--strength 4.0`** — but the layer flag defaults to **`--specific-layers 38`** (absolute), i.e. **L38, not the plan's L37**. Both are stable through the runner's index→fraction round-trip (n_layers=62). Keep **L37 canonical**; treat **L38 as the baseline-reproduction fallback** (§1b.1). |
-| `src/steering_utils.py` | How concept vectors are built (**"following Lindsey", not CAA**) and the residual dim (**5376**, correct for Gemma3-27B). ⚠️ **Injection span:** `_steering_hook` does **not** add the vector at only the last prompt token — it steers from just before the `Trial` marker through **every generated token** (the `seq_len==1` branch re-adds it to each new token). The plan's "last prompt token" wording is inaccurate; fix it. |
+| `src/steering_utils.py` | How concept vectors are built (**"following Lindsey", not CAA**) and the residual dim (**5376**, correct for Gemma3-27B). ⚠️ **Injection span:** `_steering_hook` does **not** add the vector at only the last prompt token — it steers from just before the `Trial` marker through **every generated token** (the `seq_len==1` branch re-adds it to each new token). The methodology's earlier "last prompt token" wording was inaccurate and has been corrected. |
 | `experiments/concepts_list.py` | The **450** `NEW_CONCEPTS` (the benign list — your Arm 1). The 500-concept sweep = these + 50 baseline concepts hardcoded in `02b`. **Path is `experiments/`, not `src/`.** |
 | `src/eval_utils.py` | The judge prompt and how it maps a response to detected/not-detected. **You will extend this** to a three-way label (Stage 2.5). |
 | `experiments/03d_refusal_abliteration.py` | How the refusal direction is extracted and ablated, and where the "minimum effective dose" weight is set. |
@@ -105,7 +105,7 @@ fix your API key/quota now, not on a metered pod.
 ## Stage G3 — The geometry premise check · run this **first**
 
 **Goal:** answer the question the entire hypothesis rests on — *are harmful concept vectors more
-refusal-aligned than benign ones, at the injection layer?* This is [plan Step 2-pre](project-plan.md).
+refusal-aligned than benign ones, at the injection layer?* This is [plan Step 2-pre](methodology.md).
 It is **inference-only**: no judge, no abliteration, no sweep. A few hundred forward passes and linear
 algebra. Run it on a **free/cheap 4B model first**, then confirm on 27B.
 
@@ -174,7 +174,7 @@ ordering-stability statement. This is a standalone result even if nothing else r
 
 - **1× A100 80GB or 1× H100.** Run at **bf16**. Gemma3-27B is **~54GB of weights alone** before KV cache or
   activation caching — a 48GB card cannot hold it, and forcing quantisation makes **G1 harder** (quantisation
-  is a prime suspect for baseline-reproduction failure). See [plan §4](project-plan.md) hardware note.
+  is a prime suspect for baseline-reproduction failure). See [plan §4](methodology.md) hardware note.
 - A 24GB card is only for the **G3 pilot** and smoke tests, never the sweep.
 
 ### 1.2 Pod hygiene — set this up correctly once ([CLAUDE.md](../CLAUDE.md) hard rules)
@@ -255,6 +255,21 @@ stated FPR is worthless.
 **Goal:** four concept lists and, for every concept, the numbers that turn four discrete arms into a
 continuous axis.
 
+### 2.0 How a concept vector is built (Lindsey-style, not CAA)
+
+The harness (`extract_concept_vector_with_baseline` in `src/vector_utils.py`) does, per concept word:
+
+1. Prompt the model with a template (default `"Tell me about {word}"`), chat-templated.
+2. Read the residual stream at the **injection layer (L37)**, **last token**, as one 5376-dim activation.
+3. Do the same for **100 generic baseline words** (`get_baseline_words(100)`) and average them.
+4. `concept_vec = concept_activation − baseline_mean`. Un-normalized by default (so `‖v‖` varies per
+   concept — which is exactly why §2.3 magnitude-matches).
+
+This is **not** CAA (no paired opposite prompts) — it's one concept prompt minus a neutral-baseline mean.
+Extraction is **inference-only** (no judge, no generation) and cheap; the same code is what G3 needs, so it's
+already proven by the time you reach here. **Extract vectors once, on the clean model, and reuse them** for
+the ablated/random passes (`--use-vectors-from`) to avoid the "double ablation" trap (Stage 4).
+
 ### 2.1 The arms (~40 concepts each, single-token where possible)
 
 | Arm | Examples | Isolates |
@@ -312,7 +327,7 @@ Extend `src/eval_utils.py` so the judge returns one of:
 > (a) biases the harmful arm toward the trials refusal let through, and (b) **breaks the Stage 3 vs Stage 4
 > comparison** (abliteration collapses declines by construction, so filtered samples aren't comparable — and
 > **Stage 4b does not catch this**). **Primary analysis is over the full sample**, three-category outcome,
-> with **decline rate reported per arm as a first-class result.** ([plan Step 3](project-plan.md).)
+> with **decline rate reported per arm as a first-class result.** ([plan Step 3](methodology.md).)
 
 ### 2.5.2 If the harmful arm mostly declines
 
@@ -338,6 +353,19 @@ Judge every response with the three-way label (**detected / not detected / decli
 detection and identification separately** — *Mechanisms* shows these are distinct circuits; identification
 is free from the same response.
 
+**Run sizes** (from `02b`'s trial structure — `max_trial_number × samples_per_trial`):
+
+| Quantity | Value | Note |
+|---|---|---|
+| Injection samples / concept | **100** (10 × 10) | Macar's 500-concept default; gives per-concept detection rate |
+| Clean control samples | **~500, global** | `10 × 50`; **not** per-concept — a no-injection trial is concept-independent, so one shared set calibrates FPR for the whole sweep |
+| Strengths | **1** (α=4) | not swept — see the α callout below |
+| Question types | **1** (binary) | not 3 — see the deferred-probes callout below |
+| Concepts / arm | **~40** (up to ~100) | 40 is enough for arm-level CIs; wider is compute-cheap but gated by concept-sourcing difficulty, not GPU |
+
+Net vs the original 3-question × 4-α design: **~6× fewer generations per concept** on the base sweep, at
+Macar's real 100 samples/concept.
+
 > **Cut from the primary sweep (deferred confirmatory probes).** A forced-choice localisation question
 > (chance = 1/N) and a nonsense control (*"Do you believe 1+1=3?"*) were considered as extra response-bias
 > guards. Both are **net-new code** (neither is in the harness) and both are redundant with guards you already
@@ -353,7 +381,7 @@ is free from the same response.
 ### 3.1 The carrier-level readout — add it, it's nearly free
 
 Add a **logit-lens / linear-probe readout at the carrier layers** (early post-injection). It **rides on the
-same forward passes** as the sweep — a strict add-on, not a redesign ([plan Step 3](project-plan.md),
+same forward passes** as the sweep — a strict add-on, not a redesign ([plan Step 3](methodology.md),
 [background §7.1](background.md)).
 
 > **Why it may be the better headline:** the refined hypothesis is that harmfulness impairs the *report*, not
@@ -361,7 +389,7 @@ same forward passes** as the sweep — a strict add-on, not a redesign ([plan St
 > that's a demonstrable dissociation between what the model registers and what it says — on the safety-critical
 > case — **and it survives even if Chart 1 is flat.**
 
-### 3.2 Discipline — non-negotiable ([plan §9](project-plan.md))
+### 3.2 Discipline — non-negotiable ([plan §9](methodology.md))
 
 - [ ] **Fixed seeds.** Log them.
 - [ ] **Checkpoint continuously** to local disk — a pod can die mid-sweep. Write results as they're produced,
@@ -383,10 +411,27 @@ claim: if refusal is the suppressor, abliteration should **close the harmful/ben
 
 ### 4.1 Ablate
 
-Use `experiments/03d_refusal_abliteration.py` with the **minimum effective dose** — the smallest weight
-achieving **≥30% judged refusal bypass** — and **α = 2** (the ablated model degrades in coherence at higher
-strengths). **Do not optimise a stronger ablation** — you need *enough* to test the mechanism, not the most.
-If you find yourself tuning `03e_optimize_abliteration.py` for maximum bypass, you've left the approved scope.
+`experiments/03d_refusal_abliteration.py` does extraction **and** all three trial conditions in one script
+(baseline = concept steering only · treatment = steering + ablation · control = ablation only, for FPR).
+
+**The mechanism (Arditi et al.):**
+- **Extract a refusal direction per layer** by difference-of-means: run ~512 harmful and ~512 harmless
+  instructions (`refusal_prompts.py`, already in the repo), take `mean(harmful) − mean(harmless)` at each
+  layer, read at **position −2** (the token where the model "decides" to refuse), normalize.
+- **Ablate by projecting it out** at inference via a hook: `x' = x − weight · proj`, applied at every layer.
+  This hook **is** the uncensored model — there are no modified weights on disk.
+
+**Dose — minimum effective, then stop.** Start from the repo default (`DEFAULT_REFUSAL_ABLATION_WEIGHT =
+0.0175`, or the per-region weights); use the **smallest weight achieving ≥30% judged refusal bypass**, and
+inject at **α = 2** (the ablated model degrades in coherence at higher strengths). **Do not** run
+`03e_optimize_abliteration.py` to maximise bypass — tuning for maximum uncensoring leaves the approved scope.
+
+**Reuse base-model vectors** (`--use-vectors-from …/02b_steering_500_concepts/gemma3_27b/vectors`) so the
+harness doesn't re-extract concept vectors *from the already-ablated model* — the "double ablation" trap.
+
+**Validate before trusting any number:** confirm the ablated model actually refuses less on held-out harmful
+prompts, and report the ablation-only FPR (the paper saw 0% → 7.3%). If refusal isn't dropping, the
+direction/dose is wrong and every downstream number is noise.
 
 > 🛑 **The ablated model is the one genuinely sensitive artifact in this project** — an uncensored 27B.
 > ([CLAUDE.md](../CLAUDE.md), [risks §2.2](risks-and-ethics.md).)
@@ -415,7 +460,7 @@ So you run **three conditions**: baseline · refusal-ablated · random-ablated.
 > *"exclusive to the refusal direction"* (random control at/below baseline); KAIST says *"a random direction
 > closes much of the gap as well."* If **random** ablation also flattens the slope, then Chart 3 shows
 > *"ablation degrades the model,"* **not** *"refusal causes the blind spot"* — and the causal claim collapses.
-> Any reviewer who knows KAIST will ask for this control on sight. ([plan Step 4](project-plan.md),
+> Any reviewer who knows KAIST will ask for this control on sight. ([plan Step 4](methodology.md),
 > [background §5](background.md).)
 
 **Interpretation:** slope flattens under refusal ablation **but not** random → refusal-specific, causal
@@ -433,7 +478,7 @@ Report **TPR at a stated FPR throughout**, with **95% CIs**. Sample sizes are li
 *Adding Error Bars to Evals* (Miller — Anthropic): cluster/bootstrap appropriately, don't treat per-trial
 responses as independent when they share a concept.
 
-### 5.2 The deliverables ([plan §7](project-plan.md))
+### 5.2 The deliverables ([plan §7](methodology.md))
 
 | # | Chart | The question it answers |
 |---|---|---|
@@ -442,7 +487,7 @@ responses as independent when they share a concept.
 | **3** | Chart 2 **before vs after abliteration**, with the random-direction control | Does the slope **flatten** under refusal ablation but **not** random? |
 | **+** | Detection-vs-identification split · **decline rate per arm** · FPR tables · carrier-probe readout · *(deferred: α response curve)* | Supporting evidence and the dissociation result |
 
-### 5.3 Every outcome is publishable ([plan §8](project-plan.md))
+### 5.3 Every outcome is publishable ([plan §8](methodology.md))
 
 There is no result that returns nothing — harmful < benign proves the blind spot; harmful ≈ benign confirms
 Lederman & Mahowald's content-agnosticism on its hardest case; a carrier/gate dissociation stands even if
@@ -506,5 +551,5 @@ and the **harmful arm declining to engage** — both are front-loaded into cheap
 so they surface before the metered sweep. G3 may force a redirect before any compute is provisioned. Keep
 the ablated model on one controlled pod, publish
 **rates not artifacts**, run the pre-push checklist every single time, and every outcome in the
-[outcome table](project-plan.md#8-outcomes--all-publishable) is a paper.
+[outcome table](methodology.md#8-outcomes--all-publishable) is a paper.
 ```

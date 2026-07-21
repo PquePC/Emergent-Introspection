@@ -1,8 +1,12 @@
-# Main Project Plan — The Safety-Shaped Blind Spot
+# Methodology — The Safety-Shaped Blind Spot
 
-### *Do language models notice when you inject a harmful thought?*
+### *The experimental method: design, arms, measure, gates, deliverables, outcomes.*
 
-> Evidence base and citations: [`background.md`](background.md) · References: [`../BIBLIOGRAPHY.md`](../BIBLIOGRAPHY.md)
+> **This file is the isolated methodology — *what* the experiment is and *why* each choice is made.**
+> For *how to run it* (commands, sizes, debugging, RunPod), see the step-by-step
+> [`execution-guide.md`](execution-guide.md). Context and literature: [`background.md`](background.md) ·
+> References: [`../BIBLIOGRAPHY.md`](../BIBLIOGRAPHY.md) · Ethics & feasibility:
+> [`risks-and-ethics.md`](risks-and-ethics.md).
 
 ---
 
@@ -25,7 +29,7 @@ Meanwhile, the same paper found what **suppresses** this noticing: refusal train
 
 > *"introspection and refusal mechanisms are **in tension** in many current LLMs."*
 
-**Put those together, and they yield a prediction nobody has tested:**
+**Put those together, and they yield an untested prediction:**
 
 > ### If refusal suppresses introspection, and harmful concepts trigger refusal, then models should be *worst* at noticing exactly the manipulations we most need them to notice.
 
@@ -33,43 +37,26 @@ Meanwhile, the same paper found what **suppresses** this noticing: refusal train
 
 ## 2. Why the prediction is well-founded
 
-The causal chain is assembled from published findings, not speculation:
+The causal chain — full evidence and citations in [`background.md`](background.md) §3:
 
-1. **Harmful concept vectors align geometrically with the refusal direction.**
-   *Analysing the Safety Pitfalls of Steering Vectors* (Li et al. — **TU Munich / MCML**, arXiv:2603.24543): a steering vector's safety impact
-   *"correlates strongly with its geometric alignment (cosine similarity) to the model's internal refusal
-   direction."*
-2. **The refusal direction suppresses introspective detection.**
-   *Mechanisms of Introspective Awareness* (Macar et al. — **Anthropic Fellows Program**, arXiv:2603.21396): abliteration takes detection **10.8% → 63.8%**, while false positives rise
-   only **0.0% → 7.3%**.
-3. **∴ Detection should fall as a concept vector aligns with refusal.**
-4. **∴ Ablating refusal should flatten that relationship.**
+1. Harmful concept vectors align with the refusal direction (TU Munich) — **a premise, unverified for
+   *concept* vectors and contestable at the injection layer; this is gate G3.**
+2. The refusal direction suppresses detection — abliteration takes it **10.8% → 63.8%**, FPR only
+   **0.0% → 7.3%** (Macar et al.).
+3. ∴ Detection should **fall** as a concept vector aligns with refusal.
+4. ∴ Ablating refusal should **flatten** that relationship.
 
-**Independent support from an adjacent paradigm:** *Can LLMs Reliably Self-Report Adversarial Prefills?*
-finds no model reliably recognises its own compromised outputs (27.3%), and — crucially —
-*"orthogonalizing against the refusal direction reduces the gap between prefilled and natural output
-recognition to near zero."* Same mechanism, different intervention. And *Do Language Models Know When
-They'll Refuse?* notes in passing that *"weapons-related queries are consistently hardest for
-introspection."*
-
-Three papers point at this. None has run it.
+Independent support (text prefills, not injection): KAIST find 27.3% self-recognition, collapsing under
+refusal ablation. See [`background.md`](background.md) §3.2, §6.5 for why (1) is contestable at L37.
 
 ---
 
 ## 3. Why it matters
 
-**For AI safety.** A recurring hope is that models might one day tell us when something is wrong inside
-them — "I think I'm being manipulated." This project asks whether that hope survives contact with the
-cases that matter. If a model's self-monitoring has a **safety-shaped hole** — blind precisely when the
-injected concept is dangerous — then introspective self-report cannot be trusted as a safety signal
-exactly where it would be most valuable.
-
-**For evaluation.** Activation steering is used to audit models. It assumes the model can't tell. If
-harmful steering is *inherently* less detectable than benign steering, then **safety-relevant covert
-auditing already works** — no evasion technique required — and evaluations that steer models toward
-harmful behaviour are robust to the model noticing and gaming them.
-
-**Either way the finding is actionable**, which is the point.
+A **safety-shaped hole** in self-monitoring — blind precisely when the injected concept is dangerous —
+means introspective self-report cannot be trusted as a safety signal where it is most valuable. The
+converse is also actionable: if harmful steering is inherently less detectable, covert steering-based
+auditing already works. Fuller framing in [`../README.md`](../README.md).
 
 ---
 
@@ -147,14 +134,17 @@ provides everything needed:
 
 | File | Provides |
 |---|---|
-| `src/steering_utils.py` | steering vector extraction and application |
-| `experiments/01_concept_injection.py` | the core concept-injection experiment |
-| `src/concepts_list.py` | their 500-concept list (the benign baseline arm) |
-| `src/eval_utils.py` | LLM-judge evaluation and metrics |
-| `experiments/03d_refusal_abliteration.py` | refusal-direction abliteration |
-| `experiments/03e_optimize_abliteration.py` | abliteration weight optimisation |
+| `src/steering_utils.py` | steering-vector extraction and application (Lindsey-style baseline subtraction, not CAA) |
+| `experiments/02b_run_500_concepts.py` | **the baseline entrypoint** — the 500-concept sweep (wraps `02_steering_evaluation.py`); defaults already `gemma3_27b`, α=4 |
+| `experiments/01_concept_injection.py` | single-run injection harness (small-scale / smoke tests); defaults are *not* the operating point |
+| `experiments/concepts_list.py` | the 450 `NEW_CONCEPTS` benign list (+50 baseline hardcoded in `02b`) — path is `experiments/`, **not** `src/` |
+| `src/eval_utils.py` | LLM-judge evaluation and metrics (extended to a three-way *detected/not-detected/declined* label) |
+| `experiments/03d_refusal_abliteration.py` | refusal-direction abliteration (per-layer difference-of-means; runtime projection hook) |
+| `experiments/03e_optimize_abliteration.py` | abliteration weight optimisation — **out of scope; do not tune for maximum bypass** |
 
-Requirements: Python 3.10+, CUDA 12.x, an API key for the judge, and a GPU — see below.
+Requirements: Python 3.10+, CUDA 12.x, an API key for the judge, and a GPU. Exact commands, run sizes, and
+the L37-vs-L38 reproduction contingency live in [`execution-guide.md`](execution-guide.md); the hardware
+note is below.
 
 > **Hardware:** the repo states **≥48GB VRAM**, but that is a floor assuming quantisation. **Gemma3-27B at
 > bf16 is ~54GB of weights alone**, before KV cache or activation caching — a 48GB card cannot hold it.
@@ -263,6 +253,13 @@ For each arm × concept, at the operating point **α = 4** (matching Macar's sin
   (Step 1) is defined against. A single generation yields both signals: **log detection and identification
   separately** (Macar show these are distinct circuits); identification comes free from the same response.
 - The **clean, no-injection condition** — the response-bias / FPR control. TPR is only meaningful beside it.
+
+**Run size** (matching Macar's 500-concept configuration): **~100 injection samples per concept** (the harness
+runs 10 trial-numbers × 10 samples) and **~500 clean control samples that are *global*, not per-concept** —
+a no-injection trial is concept-independent, so one shared control set calibrates FPR for the whole sweep.
+Concepts per arm: **~40** is sufficient for arm-level CIs (you aggregate over concepts); up to ~100/arm is
+affordable but is gated by the difficulty of sourcing cleanly-arm-belonging concepts, not by compute. See
+[`execution-guide.md`](execution-guide.md) Stage 3 for the exact figures.
 
 Judge each response with the three-category label (*detected / not detected / declined*). Checkpoint continuously.
 
@@ -453,20 +450,9 @@ injected concept. The question this project asks is open.
 
 ## 11. Responsible use
 
-This project injects **concept words** (e.g. *weapon*), not capabilities or instructions. A semantic
-direction for a word confers no uplift — this is categorically unlike jailbreak or capability research.
-The framing is **defensive**: the question is whether a model's self-monitoring covers the safety-critical
-case, and a blind spot is an audit finding.
+Injects **concept words** (e.g. *weapon*), not capabilities — a semantic direction confers no uplift. The
+one sensitive artifact is the refusal-ablated model (Step 4): controlled pod only, weights never uploaded,
+published minimum effective dose. No vectors or generations released; aggregate rates only.
 
-*Mechanisms of Introspective Awareness* (Anthropic Fellows Program) exclude harmful concepts and flag dual-use risk for *elicitation methods* (abliteration,
-trained bias vectors). This project re-runs their **already-released** abliteration at their published
-settings rather than developing a stronger one. Refusal-direction ablation is itself published openly
-(*Refusal … Single Direction* — Arditi et al., NeurIPS 2024).
-
-**Mitigations:** no steering vectors released; concept words only; aggregate rates reported rather than
-per-concept exploits; published abliteration configuration used as-is.
-
-**If harmful concepts are ruled out on ethics review,** the project falls back to arm 3 alone
-(harm-adjacent-but-harmless: *police, surgery, medicine*) plus the continuous `cos(v, d_refusal)` analysis
-of Chart 2 — which tests the same mechanism with no harmful concepts at all. Weaker headline, identical
-science.
+Full ethics position, precedent table, risk register, and the zero-harmful-concept fallback design:
+[`risks-and-ethics.md`](risks-and-ethics.md).
