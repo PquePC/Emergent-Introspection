@@ -78,8 +78,7 @@ harmful behaviour are robust to the model noticing and gaming them.
 **Model:** `google/gemma-3-27b-it` (62 layers, residual dim 5376). Chosen because *Mechanisms of Introspective Awareness* (Anthropic Fellows Program) document
 emergent introspection in it with **no detection training**, at a known operating point.
 
-**Verified operating point (from *Mechanisms of Introspective Awareness* (Anthropic Fellows Program)):** inject at **L37** (≈60% depth), **α = 4**, last prompt
-token. Baseline: **38.2% mean detection at 0% FPR** across 500 concepts (median 30.0%, range 0–100%).
+**Verified operating point (from *Mechanisms of Introspective Awareness* (Anthropic Fellows Program)):** inject at **L37** (≈60% depth), **α = 4**, added to the residual stream **from the trial question onward and at every generated token** (not a single last-token position). Baseline: **38.2% mean detection at 0% FPR** across 500 concepts (median 30.0%, range 0–100%).
 
 > ⚠️ Verify L37/α=4 against the released code before the main sweep — these constants are load-bearing.
 

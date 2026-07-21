@@ -1,6 +1,9 @@
 # Private working documents — local only, not for upstream
 private/
 
+# Upstream harness — cloned locally, tracked in its own repo, never vendored into ours
+introspection-mechanisms/
+
 # Private, author-specific Claude instructions (auto-loaded locally, never shipped)
 CLAUDE.local.md
 

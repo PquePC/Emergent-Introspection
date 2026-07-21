@@ -47,8 +47,9 @@ running unmodified, so that when you hit the GPU you are debugging *science*, no
 These have lead times (licence approval, billing verification). Do them on day one.
 
 - [ ] **Hugging Face account** + accept the **`google/gemma-3-27b-it` gated licence** on the model page.
-      Approval is usually instant but can take hours. Also accept the licence for the small Gemma-3 variant
-      you will use in G3 (e.g. `google/gemma-3-4b-it`).
+      Approval is usually instant but can take hours. Also accept the licence for the small model you'll use
+      in G3/smoke tests. **The registry has no `gemma3_4b`** — the smallest in-registry Gemma is `gemma2_2b`
+      (Gemma-**2**); accept `google/gemma-2-2b-it`, or add a Gemma-3 4B entry to `MODEL_CONFIGS` yourself.
 - [ ] **HF access token** (read scope): `huggingface-cli login` or `HF_TOKEN` env var.
 - [ ] **Judge API key.** The repo defaults to an OpenAI judge (GPT-4o family). Get an `OPENAI_API_KEY`.
       Plan to run the sweep on a **cheap judge** (e.g. `gpt-4o-mini`) with a **GPT-4o agreement subsample**
@@ -74,9 +75,10 @@ Open these and confirm the constants against the plan — **these are load-beari
 
 | File | What to confirm |
 |---|---|
-| `experiments/01_concept_injection.py` | Injection **layer index** and **α**. The plan says **L37 of 62, α=4**. Verify the repo's default matches; if it exposes them as CLI/config, note the flag names. |
-| `src/steering_utils.py` | How concept vectors are built (**"following Lindsey", not CAA**), which token position the vector is added at (**last prompt token**), and the residual dim (**5376**). |
-| `src/concepts_list.py` | The 500-concept benign list — this **is** your Arm 1. |
+| `experiments/01_concept_injection.py` | Single-run harness. The knobs are **`--layer-fraction`** (a *fraction*, not an absolute index) and **`--strength`** (this is α). Repo defaults are **`llama_8b`, `--layer-fraction 0.7`, `--strength 8.0`** — **not** the operating point. Layer = `int(n_layers × fraction)`, so for 62-layer Gemma3, **L37 ≈ fraction 0.6** (0.7 gives L43). Pass model/layer/α explicitly; don't rely on defaults. |
+| `experiments/02b_run_500_concepts.py` | **The actual baseline entrypoint** (wraps `02_steering_evaluation.py`). Its defaults already match the operating point — **`--model gemma3_27b`, `--strength 4.0`** — but the layer flag defaults to **`--specific-layers 38`** (absolute), i.e. **L38, not the plan's L37**. Both are stable through the runner's index→fraction round-trip (n_layers=62). Keep **L37 canonical**; treat **L38 as the baseline-reproduction fallback** (§1b.1). |
+| `src/steering_utils.py` | How concept vectors are built (**"following Lindsey", not CAA**) and the residual dim (**5376**, correct for Gemma3-27B). ⚠️ **Injection span:** `_steering_hook` does **not** add the vector at only the last prompt token — it steers from just before the `Trial` marker through **every generated token** (the `seq_len==1` branch re-adds it to each new token). The plan's "last prompt token" wording is inaccurate; fix it. |
+| `experiments/concepts_list.py` | The **450** `NEW_CONCEPTS` (the benign list — your Arm 1). The 500-concept sweep = these + 50 baseline concepts hardcoded in `02b`. **Path is `experiments/`, not `src/`.** |
 | `src/eval_utils.py` | The judge prompt and how it maps a response to detected/not-detected. **You will extend this** to a three-way label (Stage 2.5). |
 | `experiments/03d_refusal_abliteration.py` | How the refusal direction is extracted and ablated, and where the "minimum effective dose" weight is set. |
 
@@ -91,8 +93,8 @@ model loads, a vector gets built, a generation comes out, the judge returns a la
 for correct detection rates here, only for "no exceptions."
 
 ```bash
-# illustrative — use the repo's actual entrypoint/flags
-python experiments/01_concept_injection.py --model google/gemma-3-4b-it --concepts bread,hammer --alpha 4 --limit 5
+# real flags. NOTE: there is no gemma3_4b in the registry — the smallest Gemma is gemma2_2b (Gemma-2).
+python experiments/01_concept_injection.py --models gemma2_2b --concepts bread hammer --strength 4.0 --layer-fraction 0.6 --n-trials 2
 ```
 
 **Expect:** a handful of generations and judge labels written to an output dir. **If the judge call fails**,
@@ -205,10 +207,20 @@ Until this clears, **every downstream number is meaningless.**
 ### 1b.1 Run it
 
 ```bash
-# their harness, their concepts, their operating point — no modifications
-python experiments/01_concept_injection.py --model google/gemma-3-27b-it \
-    --layer 37 --alpha 4 --concepts_file src/concepts_list.py
-# then judge the outputs with src/eval_utils.py and compute TPR at 0% FPR
+# the real baseline entrypoint is the 500-concept runner, not 01.
+# L37 is our canonical operating point (the plan). The repo's OWN default here is L38.
+python experiments/02b_run_500_concepts.py --model gemma3_27b \
+    --specific-layers 37 --strength 4.0
+#
+# ⚠️ L37 vs L38 — run BOTH if needed. If L37 does not land near ~38% TPR @ 0% FPR,
+# re-run at L38 before suspecting anything else: the published 38.2% may have been measured
+# at the repo's default L38, and the two layers are adjacent.
+#     python experiments/02b_run_500_concepts.py --model gemma3_27b --specific-layers 38 --strength 4.0
+# (The runner round-trips the index through a fraction; at n_layers=62 both 37->37 and 38->38
+#  are stable, so these are genuinely L37 and L38 — not a rounding artifact.)
+#
+# Judging runs incrementally (LLMJudge in src/eval_utils.py) unless you pass --no-llm-judge;
+# then compute TPR at 0% FPR. Include the clean/no-injection condition for FPR.
 ```
 
 Include the **clean, no-injection condition** in the same run so you can compute **FPR**. TPR without a
@@ -227,7 +239,7 @@ stated FPR is worthless.
 |---|---|---|
 | **Quantisation** (most likely) | Are you truly at bf16? | Reload at bf16 on 80GB. |
 | **Prompt template** | Are you using the exact chat template / system prompt the paper used? | Match it character-for-character; Gemma-3 is sensitive to its turn format. |
-| **Injection layer / α** | Is it really L37, α=4, last prompt token? | Reconcile with §0.3. |
+| **Injection layer / α** | Is it L37, α=4? (Note the steering **span**, not "last token" — §0.3.) | Confirm α=4. **Run L37 first, then L38** — L38 is the repo's own default and the published 38.2% may have used it. Adjacent layers; try both before deeper debugging. |
 | **Judge config** | Is the judge prompt and model the repo's default? | Use their default judge first; only swap to a cheaper judge *after* baseline passes, and re-validate. |
 | **Vector construction** | Lindsey-style, not CAA? | Confirm in `steering_utils.py`. |
 
