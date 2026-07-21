@@ -184,8 +184,12 @@ only) argues apparent detection is *"entirely explained by global logit shifts t
 affirmative responses."* **Partial rebuttal:** *Mechanisms of Introspective Awareness* (Anthropic) reports 38.2% TPR at **0% FPR** across 500 concepts —
 a pure logit shift cannot produce 0% FPR.
 
-**Resolution adopted here:** keep their *prescription* (forced-choice > binary; report FPR; use nonsense
-controls) regardless of the strength of their claim. Good practice either way.
+**Resolution adopted here:** the 0% FPR calibration *is* the rebuttal — report clean-input FPR beside every
+TPR, and calibrate the detection threshold at a genuine 0% FPR, where a pure logit shift cannot survive.
+Combined with magnitude-matching across arms, this is the standing bias defense. Their fuller prescription
+(forced-choice localisation at chance 1/N; nonsense controls) is kept as a **deferred confirmatory probe** —
+neither is in the released harness, and both are pulled back only if a harmful-vs-benign gap appears, over
+the affected concepts only. Good practice, but not on the critical path.
 
 **Does framing matter?** Yes. KAIST: *"recognition depends on how the question is framed"* — their two
 probes gave qualitatively different signals on the same models. Report multiple framings.
