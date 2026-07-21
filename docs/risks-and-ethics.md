@@ -174,83 +174,15 @@ transcoder scripts will run out of memory. Do not plan the main experiment aroun
 
 ### 3.3 The four things most likely to go wrong
 
-**① The baseline doesn't reproduce.** *(Most likely.)*
-Prompt formatting, judge configuration, and quantisation all shift detection rates. **This is a hard gate**
-— every downstream number is meaningless without ~38% TPR @ 0% FPR. Budget real time for it, and escalate
-for review rather than pressing on with a broken baseline.
+Feasibility inventory; full mitigations are the gates in [`methodology.md`](methodology.md) and the
+[`execution-guide.md`](execution-guide.md).
 
-**② Refusal-to-engage masquerades as non-detection.** *(Most dangerous.)*
-Inject "weapon", ask "do you detect an injected thought?", and the model may respond *"I can't help with
-that"* — which is **not** a failure to detect. It is a refusal to engage. If the judge scores that as
-"no detection," the measured result is a spectacular blind spot that is pure artifact, and the whole
-headline will be wrong.
-
-> **Mitigation:** the judge must distinguish three outcomes — *detected* / *did not detect* / *declined to
-> engage*. **Pilot this on ~5 harmful concepts before spending anything on the full sweep.** If refusal
-> dominates the harmful arm, add a neutral framing ("You are participating in an interpretability
-> experiment…") and re-pilot.
->
-> Note *Can LLMs Reliably Self-Report Adversarial Prefills?* (KAIST) found *"recognition depends on how the question is framed"* — their two probes gave
-> qualitatively different signals on the same models. Framing is not a detail here.
->
-> ### ⚠️ But the three-way label is necessary, not sufficient — **do not filter the declines**
->
-> The obvious next step — drop the declines and analyse the rest — **introduces a selection effect that the
-> random-direction control does not catch.** If declining is itself refusal-mediated, then "declined" is not
-> a nuisance category: **it is a realisation of the dependent variable.** The refusal mechanism acting on the
-> report *is the thing being measured.*
->
-> 1. **Filtering biases the harmful arm** toward the subset of trials the refusal machinery let through —
->    exactly the population where the hypothesised effect is weakest. It attenuates the effect being
->    estimated.
-> 2. **It breaks the Step 3 / Step 4 comparison.** Abliteration collapses the decline rate *by
->    construction*, so filtered Step 3 and filtered Step 4 are computed over differently-selected samples,
->    and a slope change is partly a change in *who was measured*. **Step 4b does not catch this** — random
->    ablation does not collapse declines the same way.
->
-> **Design:** three-category outcome, **primary analysis over the full sample**, decline rate reported per
-> arm as a first-class result. A harmful-arm decline rate that collapses under refusal ablation but *not*
-> random ablation is clean evidence for the mechanism — **and it is obtainable even if detection shows
-> nothing.** Run the filtered analysis as a clearly-labelled secondary, conditional on engagement.
-
-**③ The mechanism's premise fails.** *(Cheapest to check — check it first.)*
-The whole hypothesis assumes `cos(v_harmful, d_refusal) > cos(v_benign, d_refusal)`. *Analysing the Safety Pitfalls of Steering Vectors* (TU Munich) showed this for
-**behavioural** steering vectors (sycophancy, corrigibility) — **not for concept vectors**. Whether a
-"weapon" *concept* vector aligns with refusal is genuinely untested.
-
-> **Mitigation: run the premise check (G3) before any sweep** — `methodology.md` Step 2-pre. It is
-> inference-only: no judge, no abliteration, no sweep. A few hundred forward passes and some linear algebra.
-> **Runnable on a free 4B-class model before any compute is provisioned**, then confirmed on 27B for a few
-> dollars.
->
-> ⚠️ **It is no longer "one cosine computation," and the 2026 geometry literature makes a null genuinely
-> plausible rather than a formality:**
-> - **HARC (arXiv:2607.00572):** `v_harm` and `v_ref` are **distinct** directions whose alignment *"peaks
->   around L12 and then drops through the late layers (L20–L28)"* toward orthogonality. **This project
->   injects at L37/62 (~60% depth) — late.** If harm and refusal are decoupled there, the mechanism has no
->   purchase at the injection layer. ⇒ **sweep layers.**
-> - **Llorente-Saguer (arXiv:2604.18901):** two pooling choices at the *same layer of the same model* recover
->   harm directions **73° apart**. ⇒ **sweep extraction protocol and pre-register one; report whether the
->   benign/harmful ordering is stable. If the sign flips with pooling, the premise is not established.**
-> - **Concept cones (arXiv:2502.17420):** refusal may not be a single direction. ⇒ **also report projection
->   onto the top-k refusal subspace.**
->
-> **A null redirects rather than kills.** *"Harmful concept vectors are not refusal-aligned at the injection
-> layer, contra the natural extension of TU Munich's behavioural-vector result"* is a real finding, obtained
-> in an afternoon rather than a month — and it reshapes the question instead of closing it.
-
-**④ Ablation effects aren't refusal-specific.**
-KAIST found that *"a random direction closes much of the gap as well, so the refusal direction is
-sufficient to account for the signal **without being its only mediator**."* Macar, by contrast, report the
-abliteration effect is *"exclusive to the refusal direction"* — a magnitude-matched random-direction
-control yielded no uplift.
-
-**These two directly conflict, and it lands squarely on Step 4.**
-
-> **Mitigation:** a **random-direction ablation control is mandatory**, not optional. If ablating a random
-> direction also flattens the slope, then Chart 3 shows "ablation damages the model," not "refusal causes
-> the blind spot." Without this control the causal claim is unsupportable — and a reviewer who knows the
-> *Can LLMs Reliably Self-Report Adversarial Prefills?* (KAIST) will say so immediately.
+| # | Failure mode | Why it bites | Guard |
+|---|---|---|---|
+| ① | **Baseline doesn't reproduce** *(most likely)* | quantisation, prompt template, or wrong layer — and without ~38% TPR@0%FPR every downstream number is meaningless | Hard gate **G1**: run bf16 on 80GB, try L37 then L38, escalate rather than press on |
+| ② | **Refusal-to-engage masquerades as non-detection** *(most dangerous)* | *"I can't help with that"* scored as "no detection" fabricates a blind spot | Three-way judge label; pilot ~5 harmful concepts; ≥2 framings (KAIST: framing changes recognition). **Do not filter declines** — declining is the refusal mechanism acting on the report, so it is a realisation of the DV, and filtering breaks the Step 3/4 comparison (methodology Step 3) |
+| ③ | **The premise fails** *(cheapest — check first)* | harm and refusal decouple with depth (HARC), and L37 is late, so concept vectors may not be refusal-aligned there | **G3** premise check first, on a free 4B model; sweep protocol × layer + report subspace projection. A null redirects the project, not kills it |
+| ④ | **Ablation isn't refusal-specific** | Macar ("exclusive to the refusal direction") and KAIST ("a random direction closes much of the gap") disagree | Mandatory random-direction control (**G5**); if random flattens the slope too, the causal claim collapses |
 
 ### 3.4 What "done" looks like
 
