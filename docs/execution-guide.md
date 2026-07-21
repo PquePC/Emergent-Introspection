@@ -49,11 +49,12 @@ These have lead times (licence approval, billing verification). Do them on day o
 - [ ] **Hugging Face account** + accept the **`google/gemma-3-27b-it` gated licence** on the model page.
       Approval is usually instant but can take hours. Also accept the licence for the small model you'll use
       in G3/smoke tests. **The registry has no `gemma3_4b`** — the smallest in-registry Gemma is `gemma2_2b`
-      (Gemma-**2**); accept `google/gemma-2-2b-it`, or add a Gemma-3 4B entry to `MODEL_CONFIGS` yourself.
+      (Gemma-**2**); accept `google/gemma-2-2b-it`, or add a Gemma-3 4B entry to `MODEL_NAME_MAP`
+      (`src/model_utils.py`) yourself.
 - [ ] **HF access token** (read scope): `huggingface-cli login` or `HF_TOKEN` env var.
-- [ ] **Judge API key.** The repo defaults to an OpenAI judge (GPT-4o family). Get an `OPENAI_API_KEY`.
-      Plan to run the sweep on a **cheap judge** (e.g. `gpt-4o-mini`) with a **GPT-4o agreement subsample**
-      for validation — see [§4 of the plan](methodology.md) and Stage 5 below.
+- [ ] **Judge API key.** The repo defaults to an OpenAI judge (**GPT-4.1 family, default `gpt-4.1-mini`**).
+      Get an `OPENAI_API_KEY`. Run the sweep on the cheap default with a **stronger-model agreement
+      subsample** for validation — see [§4 of the plan](methodology.md) and Stage 5 below.
 - [ ] **A GPU-rental account** (RunPod / Lambda / Vast). Do **not** provision yet.
 
 ### 0.2 Clone and install
@@ -77,7 +78,8 @@ Open these and confirm the constants against the plan — **these are load-beari
 |---|---|
 | `experiments/01_concept_injection.py` | Single-run harness. The knobs are **`--layer-fraction`** (a *fraction*, not an absolute index) and **`--strength`** (this is α). Repo defaults are **`llama_8b`, `--layer-fraction 0.7`, `--strength 8.0`** — **not** the operating point. Layer = `int(n_layers × fraction)`, so for 62-layer Gemma3, **L37 ≈ fraction 0.6** (0.7 gives L43). Pass model/layer/α explicitly; don't rely on defaults. |
 | `experiments/02b_run_500_concepts.py` | **The actual baseline entrypoint** (wraps `02_steering_evaluation.py`). Its defaults already match the operating point — **`--model gemma3_27b`, `--strength 4.0`** — but the layer flag defaults to **`--specific-layers 38`** (absolute), i.e. **L38, not the plan's L37**. Both are stable through the runner's index→fraction round-trip (n_layers=62). Keep **L37 canonical**; treat **L38 as the baseline-reproduction fallback** (§1b.1). |
-| `src/steering_utils.py` | How concept vectors are built (**"following Lindsey", not CAA**) and the residual dim (**5376**, correct for Gemma3-27B). ⚠️ **Injection span:** `_steering_hook` does **not** add the vector at only the last prompt token — it steers from just before the `Trial` marker through **every generated token** (the `seq_len==1` branch re-adds it to each new token). The methodology's earlier "last prompt token" wording was inaccurate and has been corrected. |
+| `src/vector_utils.py` | **How concept vectors are built** — `extract_concept_vector_with_baseline`: **"following Lindsey", not CAA** (concept-prompt activation minus the mean of 100 baseline words, last token, un-normalized). Residual dim **5376**. |
+| `src/steering_utils.py` | **How the vector is applied.** ⚠️ **Injection span:** `_steering_hook` does **not** add the vector at only the last prompt token — it steers from just before the `Trial` marker through **every generated token** (the `seq_len==1` branch re-adds it to each new token). The methodology's earlier "last prompt token" wording was inaccurate and has been corrected. |
 | `experiments/concepts_list.py` | The **450** `NEW_CONCEPTS` (the benign list — your Arm 1). The 500-concept sweep = these + 50 baseline concepts hardcoded in `02b`. **Path is `experiments/`, not `src/`.** |
 | `src/eval_utils.py` | The judge prompt and how it maps a response to detected/not-detected. **You will extend this** to a three-way label (Stage 2.5). |
 | `experiments/03d_refusal_abliteration.py` | How the refusal direction is extracted and ablated, and where the "minimum effective dose" weight is set. |
