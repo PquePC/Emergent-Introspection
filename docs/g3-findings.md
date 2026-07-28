@@ -15,7 +15,7 @@ protocols, with a top-k refusal-subspace projection as the cone-robustness check
 | Model | Family | Injection layer | Harmful > benign? | Stable across protocols? | Verdict |
 |---|---|---|---|---|---|
 | `gemma-2-2b-it` | Gemma-2 (**pilot**) | L15 / 26 (0.6) | yes — Δ **+0.293** (last) | **yes** | premise holds *(pilot)* |
-| `gemma-3-4b-it` | Gemma-3 (target family) | — | *pending* | *pending* | *pending* |
+| `gemma-3-4b-it` | Gemma-3 (target family) | L20 / 34 (0.6) | yes — Δ **+0.428** (last) | yes (harmful vs benign) | holds; **valence confound** at last-token |
 | `gemma-3-27b-it` | Gemma-3 (**target**) | L37 / 62 (0.6) | *not run — funded stage* | — | *pending* |
 
 > The pilot validates the code path end-to-end and shows the premise is **plausible**. It does **not** settle
@@ -54,8 +54,48 @@ Gemma-3-27B at the true operating point (L37).
 
 ---
 
-## `gemma-3-4b-it` — pending
+## `gemma-3-4b-it` (target family) — premise holds, with a valence caveat
 
-Run G3.1–G3.4 with `G3_MODEL = "google/gemma-3-4b-it"`. Record here: `cos`-by-arm at the injection layer
-(both protocols), ordering stability, and the subspace projection. The read to watch: does harmful stay
-clearly above benign at ~60% depth, with valence ≈ benign and harm-adjacent intermediate, as in the pilot?
+Injection layer **L20 / 34** (fraction 0.6). Same config (120 pairs, ~10 concepts/arm, 100 baseline words,
+top-5 subspace). Note: `gemma-3-4b-it` is **multimodal** — activations read from the text stack
+(`config.text_config`).
+
+`cos(v_concept, d_refusal)` at the injection layer, per arm:
+
+| Arm | last-token | max-pool | subspace proj. (last-token) |
+|---|---|---|---|
+| **harmful** | **+0.607** | **+0.156** | 0.694 |
+| valence | +0.477 | +0.065 | 0.565 |
+| harm-adjacent | +0.268 | +0.060 | 0.659 |
+| benign | +0.179 | −0.010 | 0.480 |
+
+Δ(harmful − benign): **+0.428** (last-token), **+0.166** (max-pool). Harmful > benign **stable across both
+protocols**.
+
+**Reading — the core premise holds family-correct, but the confound structure is protocol-dependent:**
+- ✅ **Harmful is the top arm at the injection layer under both protocols** — the family-correct confirmation
+  the project needed.
+- ⚠️ **Valence is a live confound at the last-token protocol.** cos(valence) = +0.477 sits much closer to
+  harmful (+0.607) than to benign (+0.179) — negative-valence concepts are *also* strongly refusal-aligned in
+  Gemma-3. This did **not** appear in the Gemma-2 pilot (valence ≈ benign there). Under max-pool, valence
+  collapses back to ≈ benign (+0.065 vs −0.010) and harmful is cleanly on top, but at much smaller magnitudes.
+- The last-token protocol is the one that **matches how concept vectors are actually built and injected**
+  (harness construction), so the valence elevation is the operationally relevant case, not a curiosity.
+- The top-k subspace projection is **weakly discriminating** here — all arms fall in 0.48–0.69, harmful only
+  marginally above harm-adjacent (0.694 vs 0.659). At this depth the refusal subspace captures a large
+  fraction of every arm.
+- The last-token cos trace is **volatile across layers** (large negative excursions ~L10–12); max-pool is
+  smooth. L20 sits past the volatile region.
+
+**Implications for the main experiment:**
+1. **Arm 2 (negative-valence) is load-bearing, now confirmed empirically for the family.** A harmful-arm
+   detection drop cannot be attributed to *harmfulness* without it, because harm and valence are
+   geometrically close at the injection protocol. The dissociation becomes a **behavioural** question
+   (Stage 3 arm contrast) — exactly what the four-arm design exists for.
+2. **Pre-register the extraction protocol** and report cos per protocol per arm — harm-vs-valence
+   separability depends on it (the 73° sensitivity, realised).
+3. **Confirm at Gemma-3-27B, L37** when funded — the 4B is family-correct but neither the target model nor
+   the exact operating point.
+
+**Verdict:** premise holds (harmful > benign, stable across protocols, family-correct). G3 does not block
+Stage 1. Carry the valence caveat forward as a first-class interpretive constraint on Chart 1 / Chart 2.
