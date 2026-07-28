@@ -206,6 +206,27 @@ huggingface-cli login          # token from Stage 0
 **Goal:** run their pipeline **unchanged** on their concept list and hit **~38% TPR at 0% FPR** at L37, α=4.
 Until this clears, **every downstream number is meaningless.**
 
+> ### Scope — run Macar's *baseline* only, no variation suite
+>
+> **Decision (correct for this expansion): reproduce Macar's core injected-thoughts detection — baseline
+> prompt, operating point, nothing else — and skip the paper's variation experiments** (persona variants
+> `03b`, prompt-phrasing variants `03c`, behavioural-robustness `03`, and the α / layer sweeps). Those are
+> *their* robustness checks; the four-arm harmful/benign contrast — the point of this expansion — is
+> anchored on the baseline, not on re-running their robustness suite. Baseline-only also fixes α=4 / L37, consistent with
+> the plan (the α sweep is already deferred to Stage 3).
+>
+> **Four things that are *not* "variations" and must still be run:**
+> 1. **The clean / no-injection condition is mandatory, not optional.** It is the 0%-FPR calibration — the
+>    entire rebuttal to the "binary detection is just response bias" critique (Hahami et al., [background
+>    §9](background.md)). Drop it and every TPR is meaningless. It is a **control, not a variation.**
+> 2. **Match the baseline prompt, chat template, and judge exactly.** Gemma-3 is turn-format sensitive; a
+>    paraphrased probe or a different grader will not reproduce 38.2%. "Baseline prompt" means *their*
+>    baseline prompt, character-for-character (§1b.3).
+> 3. **Keep detection *and* identification.** Distinct circuits (Macar); identification is free from the same
+>    generation. Log both, even though only detection gates G1.
+> 4. **The harmful-arm framing test (Stage 2.5, ≥2 framings) still runs.** That is *your* refusal-confound
+>    control, not one of Macar's variations you are skipping — do not conflate the two.
+
 ### 1b.1 Run it
 
 ```bash
@@ -249,6 +270,34 @@ stated FPR is worthless.
 > plan's contingency is to apply the **abliteration arm (Stage 4) early as an elicitation lever** and report
 > *elicited* numbers throughout — but only after you've genuinely ruled out the four suspects above. Treat a
 > persistent miss as a stop-and-reassess, not a press-on.
+
+### 1b.4 The paper's numbers — what to compare against, matched to configuration
+
+Macar reports **several baselines from different experiments**, and they are *not* interchangeable. Compare
+each measurement against the paper number **from the same configuration**.
+
+| Your measurement | Paper target | Configuration it comes from | Gate |
+|---|---|---|---|
+| Mean TPR across 500 concepts, at 0% FPR | **38.2%** | main 500-concept sweep, L37, **α=4** | **G1 — yes** |
+| Per-concept spread | median **30.0%**, range **0–100%** | same sweep | sanity check — wide spread is *expected* |
+| Clean-input FPR | **0.0%** | same sweep, no-injection condition | yes (calibration) |
+| Identification accuracy (when detection is claimed) | *read off the paper — reported separately from TPR* | same sweep | no — report, don't gate |
+| Abliteration TPR (Stage 4 only) | **10.8% → 63.8%** | abliteration experiment, **α=2** | Stage 4 |
+| Abliteration introspection rate (Stage 4) | **4.6% → 24.1%** | abliteration, α=2 | Stage 4 |
+| Abliteration FPR rise (Stage 4) | **0.0% → 7.3%** | abliteration, α=2 | Stage 4 |
+| Random-direction control (Stage 4b) | at / below baseline | Macar's magnitude-matched control | Stage 4b |
+
+> ⚠️ **38.2% and 10.8% are both "baselines" but from different experiments.** The main sweep runs at **α=4**;
+> the abliteration experiment runs at **α=2** (coherence limit — [Stage 4](#stage-4--the-abliteration-arm-the-causal-test))
+> and on its own configuration, so its pre-abliteration baseline is *not* the α=4 main-sweep number. Treat
+> them as **separate anchors** — for **G1 you are reproducing 38.2% at α=4**, full stop. Only bring in the
+> `10.8% → 63.8%` pair at Stage 4, and only against an α=2 baseline you measured yourself.
+>
+> **Numbers deliberately not pinned here — read them off your copy, do not guess:** the exact **identification
+> accuracy**, any **per-category** breakdown across the 21 concept categories, and **Appendix H**'s
+> norm-vs-detection figure. The repo records App H's *conclusion* — *"concept vector norm is not a
+> predictor"* — which you rely on for magnitude-matching ([Stage 2.3](#23-magnitude-match-every-arm)), but
+> confirm the appendix's actual plot/number yourself rather than trusting the paraphrase.
 
 ---
 
