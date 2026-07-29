@@ -17,6 +17,7 @@ protocols, with a top-k refusal-subspace projection as the cone-robustness check
 | `gemma-2-2b-it` | Gemma-2 (**pilot**) | L15 / 26 (0.6) | yes — Δ **+0.293** (last) | **yes** | premise holds *(pilot)* |
 | `gemma-3-4b-it` | Gemma-3 (target family) | L20 / 34 (0.6) | yes — Δ **+0.428** (last) | yes (harmful vs benign) | holds; **valence confound** at last-token |
 | `gemma-3-27b-it` | Gemma-3 (**target**) | L37 / 62 (0.6) | *not run — funded stage* | — | *pending* |
+| `Qwen2.5-3B-Instruct` | Qwen (cross-family) | L21 / 36 (0.6) | yes — Δ **+0.467** (last) | yes | holds; harm-specific (valence clean) |
 
 > The pilot validates the code path end-to-end and shows the premise is **plausible**. It does **not** settle
 > it: harm/refusal coupling is family-specific (HARC depth-decoupling), so the decisive read for the project
@@ -99,3 +100,49 @@ protocols**.
 
 **Verdict:** premise holds (harmful > benign, stable across protocols, family-correct). G3 does not block
 Stage 1. Carry the valence caveat forward as a first-class interpretive constraint on Chart 1 / Chart 2.
+
+---
+
+## `Qwen2.5-3B-Instruct` (cross-family) — premise holds, harm-specific
+
+Injection layer **L21 / 36** (fraction 0.6). Same config. Run to test whether the Gemma-3 valence
+entanglement is family-general or Gemma-specific. (Qwen is ungated, flat-config, and supports the system
+role — no notebook changes needed to run it.)
+
+`cos(v_concept, d_refusal)` at the injection layer, per arm:
+
+| Arm | last-token | max-pool | subspace proj. (last-token) |
+|---|---|---|---|
+| **harmful** | **+0.441** | **+0.054** | **0.496** |
+| harm-adjacent | +0.196 | +0.039 | 0.260 |
+| valence | +0.176 | +0.023 | 0.291 |
+| benign | −0.026 | −0.021 | 0.270 |
+
+Δ(harmful − benign): **+0.467** (last-token) — the largest of the three families — and +0.075 (max-pool).
+Stable across protocols.
+
+**Reading — the cleanest separation of the three:**
+- Harmful is decisively the top arm (+0.441); valence (+0.176) and harm-adjacent (+0.196) are both modest and
+  clustered well below it, benign slightly negative.
+- **The Gemma-3 valence entanglement does not replicate.** Valence sits near harm-adjacent and far from
+  harmful — the Gemma-2-pilot pattern, not the Gemma-3-4B one.
+- The subspace projection cleanly discriminates: harmful **0.496** vs everything else ~0.26–0.29 (~1.7×),
+  unlike Gemma-3-4B where all arms crowded 0.48–0.69.
+
+---
+
+## Cross-family synthesis (3 families)
+
+| Model | Premise (harmful > benign) | Harm-specificity (valence separable) |
+|---|---|---|
+| Gemma-2-2B | ✅ holds | ✅ clean (valence ≈ benign) |
+| **Gemma-3-4B** | ✅ holds | ⚠️ **valence entangled at last-token** |
+| Qwen2.5-3B | ✅ holds (largest Δ) | ✅ clean (valence ≈ harm-adjacent, ≪ harmful) |
+
+**Two conclusions:**
+1. **The premise is robust and family-general** — harmful concept vectors are more refusal-aligned than benign
+   ones at ~60% depth in every family tested. The core hypothesis has purchase.
+2. **The valence entanglement is Gemma-3-specific, not fundamental.** It appears in Gemma-3-4B but in neither
+   Gemma-2 nor Qwen. Since the **target is Gemma-3-27B**, this makes **arm 2 (valence) essential for the target
+   experiment specifically** — but it is a feature of Gemma-3's refusal geometry, not a universal confound in
+   the method. Whether it persists at 27B / L37 is the thing to check first when funded.
