@@ -9,7 +9,7 @@
 
 ## 1. The question
 
-Activation steering has two dose–response curves that nobody has plotted against each other:
+Activation steering has two dose–response curves that the published literature does not plot against each other:
 
 - **Efficacy curve** — as steering strength rises, at what point does the intervention actually change the
   model's behaviour in the intended direction?
@@ -31,7 +31,7 @@ This is not a curiosity; the sign of the gap decides which of two very different
 | **Detectable before effective** (`DD50 < ED50`) | The model notices perturbations that are too weak to do anything. | **Research and evaluation.** Steering-based experiments that assume an unwitting subject are invalid — the model knows. Covert auditing (steer a model to elicit a latent behaviour) is blown before it works, and every steered-model eval is measuring a model that has noticed it is being steered, which is a different model. |
 
 Both outcomes are publishable and both are actionable. A gap near zero is also a result: it says detectability
-tracks efficacy, which is the benign case and the one nobody has demonstrated.
+tracks efficacy, which is the benign case and the one that remains undemonstrated.
 
 The framing also yields a clean design principle: since detection appears to be driven substantially by
 *perturbation magnitude* while efficacy is driven by *how well the vector is aimed*, **covertness is
@@ -222,7 +222,7 @@ pre-registered.
 |---|---|
 | `ED50 ≪ DD50`, wide covert window | Self-report is not a viable monitor against activation-level manipulation. The strongest and most safety-relevant outcome. |
 | `DD50 ≪ ED50` | Steering-based evaluation and covert auditing rest on a false assumption of an unwitting subject. Forces a methodological correction across a whole literature. |
-| Gap ≈ 0 | Detectability tracks efficacy — the benign case, and a positive result for self-report as a signal. Nobody has shown it. |
+| Gap ≈ 0 | Detectability tracks efficacy — the benign case, and a positive result for self-report as a signal. Not established in the literature. |
 | Gap large under cued probe, ~0 under uncued | Published detection rates overstate real-world noticing; the capacity exists but is not spontaneously deployed. |
 | Random-direction detection curve ≈ real-vector detection curve | Detection is perturbation-driven, not concept-driven; covertness reduces to efficacy-per-norm, and better-aimed steering methods are inherently stealthier. A clean, general design principle. |
 | Gap varies sharply by vector method or layer | The benchmark has real discriminative power and should be maintained as one. |
