@@ -143,6 +143,7 @@ search, and results are directly comparable to the published numbers.
 
 | File | Contents |
 |---|---|
+| [`docs/protocol.md`](docs/protocol.md) | **The one-page protocol** — every stage in Do / Why / Data form, the gates, and the deliverables; the sharp overview that links down into the two below |
 | [`docs/methodology.md`](docs/methodology.md) | **The methodology** — experimental design, four arms, operating point, primary measure, decision gates, deliverables, outcome analysis |
 | [`docs/execution-guide.md`](docs/execution-guide.md) | **The step-by-step runbook** — stage-by-stage how to run it on RunPod: setup, baseline, sweep sizes, abliteration, debugging, data hygiene |
 | [`docs/background.md`](docs/background.md) | The literature: what is established, what is contested, what is untested |

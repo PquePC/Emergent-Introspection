@@ -308,14 +308,21 @@ Judge each response with the three-category label (*detected / not detected / de
 
 > ### Add a carrier-level readout — nearly free, and possibly the better headline
 >
-> *Mechanisms* describes a **two-stage circuit**: content-agnostic **"evidence carrier"** features in early
-> post-injection layers detect perturbations along diverse directions, and these suppress downstream
-> **"gate"** features implementing a default negative response. **Refusal plausibly acts on the gate, not
-> the carriers.**
+> *Mechanisms* describes a **two-stage circuit** (§5.3–5.4): content-agnostic **"evidence carrier"** features
+> in early post-injection layers (peak L38) detect perturbations along diverse directions, and these suppress
+> downstream **"gate"** features (L45–61) implementing a default negative response.
 >
-> This sharpens the hypothesis and reconciles it with Lederman & Mahowald's content-agnosticism result
-> (`background.md`) rather than opposing it: *content-agnostic detection* and *harmfulness-dependent
-> reporting* are fully compatible if harmfulness acts at the reporting stage.
+> ⚠️ **Do not say "refusal acts on the gate."** Macar §5.4 shows the opposite for benign concepts: **gate
+> features are not refusal-specific and survive abliteration** (Fig 14 / App P; the circuit is *"robust to
+> refusal ablation"*), and the benign detection direction is **nearly orthogonal to refusal** (`cos = −0.09`,
+> §4.3). Abliteration appears to act on the *carrier* side (*"open alternative evidence channels"*), not by
+> removing the gate. The defensible claim is the **registration vs report** split below, with the locus left
+> empirical — and since Macar's gate analysis is benign-only, whether refusal engages the gate *for harmful
+> concepts* is open and directly testable here (per-arm gate/carrier readout).
+>
+> This reconciles with Lederman & Mahowald's content-agnosticism result (`background.md`) rather than opposing
+> it: *content-agnostic detection* and *harmfulness-dependent reporting* are fully compatible if harmfulness
+> acts at the reporting stage.
 >
 > > **Refined hypothesis:** harmfulness does not impair the model's internal *registration* of the
 > > injection; it impairs the model's *report* of it. The effect should appear at the reporting stage, be
@@ -330,8 +337,10 @@ Judge each response with the three-category label (*detected / not detected / de
 > comparison, and it survives even if Chart 1 is flat.
 >
 > Supporting: Llorente-Saguer (arXiv:2604.18901) finds the harm direction **survives abliteration**
-> (abliterated variants match instruction-tuned within ±0.003 AUROC) — abliteration removes the gate
-> without erasing the harm signal, which is what this prediction requires.
+> (abliterated variants match instruction-tuned within ±0.003 AUROC) — harm *representation* is independent
+> of refusal *behaviour*, so abliteration lifts the report suppression without erasing the harm signal, which
+> is what this prediction requires. (Consistent with Macar §5.4: abliteration works on the evidence/report
+> pathway, not by deleting the harm-agnostic gate.)
 
 ### Step 4 — The abliteration arm (the causal test)
 Repeat Step 3 on the refusal-ablated model using `03d_refusal_abliteration.py`. Use their minimum

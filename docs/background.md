@@ -243,19 +243,38 @@ harm labels (§5, Gondil) — and a further reason to run the premise check firs
 | Does abliteration **close the gap**, and is the effect **refusal-specific**? | **Open, and contested** — *Mechanisms of Introspective Awareness* (Anthropic) and *Can LLMs Reliably Self-Report Adversarial Prefills?* (KAIST) disagree on the random-direction control |
 | Does the model **register** an injection it will not **report**? | **Open** — see §7.1 |
 
-### 7.1 The sharpest form of the hypothesis — gate, not carrier
+### 7.1 The sharpest form of the hypothesis — registration vs report
 
-*Mechanisms* describes a **two-stage circuit**: content-agnostic **"evidence carrier"** features in early
-post-injection layers detect perturbations along diverse directions, and these **suppress downstream "gate"
-features** implementing a default negative response.
+*Mechanisms* describes a **two-stage circuit** (§5.3–5.4): content-agnostic **"evidence carrier"** features
+in early post-injection layers (peaking at **L38**) detect perturbations monotonically along diverse
+directions, and these **suppress downstream "gate" features** (concentrated at **L45–61**) implementing a
+default negative ("No, nothing was injected") response. Direct interventions confirm the causal chain:
+ablating top gate features drops detection **39.5% → 10.1%**; ablating carriers *roughly doubles* gate
+activation (they normally suppress the gate); gate activation is negatively correlated with detection
+(**r = −0.228**), so *"insufficient suppression drives detection failure."*
 
-**Refusal plausibly acts on the gate, not the carriers.** This reconciles the project with §4.1 rather than
-opposing it — *content-agnostic detection* and *harmfulness-dependent reporting* are fully compatible if
-harmfulness acts at the reporting stage.
+> ### ⚠️ Correction — refusal does **not** act on the gate (Macar's own §5.4)
+>
+> An earlier draft of this section asserted *"refusal plausibly acts on the gate, not the carriers."*
+> **Macar's data contradicts that for benign concepts, and it must be stated correctly:**
+> - **Gate features are not refusal-specific and survive abliteration.** The gate's inverted-V pattern is
+>   preserved in the abliterated model (Fig 14, Appendix P); the circuit is *"robust to refusal ablation."*
+> - **The detection direction is nearly orthogonal to refusal.** For the benign 500 concepts, the dominant
+>   concept/detection direction `d∆µ` has `cos(d∆µ, d_refusal) = −0.09` (§4.3) — Macar explicitly asked
+>   "is detection just refusal alignment?" and answered *no*.
+> - **Abliteration seems to act on the carrier side**, not the gate: *"removing the refusal direction may
+>   open alternative evidence channels not used in the original model."*
+>
+> So the *gate localisation* is wrong. What survives is the weaker, still-testable claim below — the split
+> between **registration** and **report** — with the locus of the refusal effect left as an empirical
+> question. And crucially: **Macar's gate/abliteration analysis is entirely on benign concepts.** Whether
+> refusal engages the gate *specifically for harmful concepts* — the case they excluded — is genuinely open,
+> and this project's per-arm gate/carrier readout can answer it.
 
-> **Refined hypothesis:** harmfulness does not impair the model's internal **registration** of the
-> injection; it impairs the model's **report** of it. The effect should appear at the reporting stage, be
-> absent or weaker in carrier-level probes, and abliterate away.
+> **Refined hypothesis (corrected):** harmfulness does not impair the model's internal **registration** of
+> the injection (carriers still fire, content-agnostically); it impairs the model's **report** of it. The
+> effect should appear at the reporting stage, be absent or weaker in carrier-level probes, and abliterate
+> away. This is compatible with §4.1 (content-agnostic detection) without claiming refusal acts at the gate.
 
 Two independent results support the shape of this:
 - *Latent Introspection* (arXiv:2602.20031) — a Qwen-32B model **denies injection in sampled output while
