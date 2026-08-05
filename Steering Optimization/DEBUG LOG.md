@@ -61,6 +61,7 @@ judge `openai/gpt-4.1-mini` via OpenRouter.
 | M1 result | **dissociation confirmed** at L37/α=2: D1 0.08 vs D2 0.96, sanity-clean. See `M1 Results — Origami.md` |
 | Next concept | **Lightning** (D1 0.500) — lower detection, more D2 headroom |
 | S5 band widened to 2σ | **fixed** 2026-08-05 — ±1σ flagged live per-concept vectors (Lightning 3472) |
+| Unattended runs could only be watched from a laptop | **added** 2026-08-05 — board pushed to Telegram, plus a dead man's switch. Off unless keys are set |
 
 _Bug numbering: bugs 26–27 are the last hard bugs; the 2026-08-05 items are calibration/scope, not silent-number bugs._
 
@@ -133,6 +134,38 @@ Bugs 23–24 in §4 and the 2026-08-04 entry in §8. Design consequences:
   interval implies (Decision 7j).
 - **The FPR amendment is labelled post-hoc** rather than presented as pre-committed
   (Decision 7i).
+
+### Session 6 — remote monitoring (2026-08-05)
+
+A run is ~33 minutes of paid A100 time and the RUN ALL cell was already unattended, but the
+only way to know whether to stop the pod was to be at a laptop reading the board. Optional
+Telegram push added, off unless `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` are set.
+
+- **The board is pushed, not summarised.** Every message carries the whole thing —
+  per-measure state, cells, measured s/cell, elapsed, ETA, verdict — re-cut to 24 columns so
+  it does not wrap on a phone. A summary line would raise exactly the questions that cannot
+  be answered without opening a laptop, which is the situation the alert exists to avoid.
+- **A dead man's switch is the half that matters.** A push can only fire while something is
+  alive to send it, so it cannot report an OOM kill, a lost network, or a vanished pod — the
+  failures that bill all night while looking identical to a healthy run. `HEALTHCHECK_URL`
+  pings healthchecks.io every 5 minutes; when the pings stop, they alert. Crash-only
+  alerting would have covered the cheap failures and missed the expensive ones.
+- **Push only, no command channel.** Long-polling for a `/status` command would not have
+  opened a port — `getUpdates` is outbound, like every judge call — but it would have given
+  the pod an inbound instruction channel scoped to whoever holds the bot token. A board that
+  arrives on its own makes that surface unnecessary, so it does not exist. Hard rule 2, and
+  the spirit of it.
+- **Exception messages never leave the pod.** Only `classify_exc()` output does: the class
+  name, plus a phrase from a fixed allowlist. An API error can quote its request body back,
+  and that body holds a generation with a concept injected. `status.txt` on the volume keeps
+  the raw text; `RunStatus.labels` is the sanitised parallel to `RunStatus.errors` and is the
+  only one the phone path reads.
+- **Verdict pushes fire on level change, not per beat.** A healthy run has to be quiet or the
+  alerts stop being read. `stop` is the exception and repeats every 15 minutes, because that
+  is the state where an unread message is measured in dollars.
+- Alert failures are swallowed by design — a broken channel must never break a run — which
+  makes an untested channel indistinguishable from a quiet one. `notify_test()` exists to
+  make that difference visible, and the Setup 1 output says to run it.
 
 ---
 
