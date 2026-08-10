@@ -4,6 +4,9 @@ private/
 # Upstream harness — cloned locally, tracked in its own repo, never vendored into ours
 introspection-mechanisms/
 
+# Third-party repos cloned for reference — each tracked in its own repo, never vendored into ours
+external/
+
 # Private, author-specific Claude instructions (auto-loaded locally, never shipped)
 CLAUDE.local.md
 
